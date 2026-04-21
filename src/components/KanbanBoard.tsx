@@ -65,16 +65,16 @@ export function KanbanBoard() {
               <motion.div
                 layoutId={order.id}
                 key={order.id}
-                className="card !p-4 hover:border-brand-yellow/30 transition-all group relative overflow-hidden"
+                className="card !p-4 hover:border-brand-accent/30 transition-all group relative overflow-hidden"
               >
                 <div className="flex justify-between items-start mb-3">
-                  <span className="text-[10px] font-mono text-brand-yellow font-bold">#{order.orderNumber}</span>
+                  <span className="text-[10px] font-mono text-brand-accent font-bold">#{order.orderNumber}</span>
                   <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-md bg-white/5 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <div className="p-1.5 rounded-md bg-white/5 opacity-80 group-hover:opacity-100 transition-opacity">
                       {order.paymentType === 'Card' ? (
-                        <CreditCard size={14} className="text-blue-400" />
+                        <CreditCard size={14} className="text-brand-accent" />
                       ) : (
-                        <Banknote size={14} className="text-emerald-400" />
+                        <Banknote size={14} className="text-brand-accent" />
                       )}
                     </div>
                   </div>
@@ -98,7 +98,7 @@ export function KanbanBoard() {
                   
                   <button 
                     onClick={() => handleWhatsAppAction(order)}
-                    className="flex items-center gap-2 bg-brand-yellow text-brand-sidebar py-1.5 px-3 rounded-lg text-[10px] font-black uppercase tracking-tighter hover:scale-105 active:scale-95 transition-all shadow-lg shadow-brand-yellow/10"
+                    className="flex items-center gap-2 bg-brand-accent text-brand-sidebar py-1.5 px-3 rounded-lg text-[10px] font-black uppercase tracking-tighter hover:scale-105 active:scale-95 transition-all shadow-lg shadow-brand-accent/10"
                   >
                     <MessageSquare size={12} strokeWidth={3} />
                     NOTIFICAR

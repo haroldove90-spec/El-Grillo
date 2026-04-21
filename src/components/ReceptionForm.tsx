@@ -22,7 +22,7 @@ export function ReceptionForm() {
       <div className="mb-8 flex justify-between items-end px-2">
         <div>
           <h2 className="text-2xl font-black italic tracking-tighter text-white">RECEPCIÓN</h2>
-          <p className="text-xs text-brand-yellow font-bold uppercase tracking-widest">NUEVA ORDEN DE SERVICIO</p>
+          <p className="text-xs text-brand-accent font-bold uppercase tracking-widest">NUEVA ORDEN DE SERVICIO</p>
         </div>
         <div className="text-xs font-mono text-slate-muted">PASO {step} DE 3</div>
       </div>
@@ -39,18 +39,18 @@ export function ReceptionForm() {
                 <input 
                   type="tel" 
                   placeholder="Teléfono del cliente..." 
-                  className="w-full bg-brand-card border border-brand-border rounded-xl py-4 pl-12 pr-4 text-sm focus:border-brand-yellow focus:ring-1 focus:ring-brand-yellow/30 outline-none transition-all placeholder:text-slate-600"
+                  className="w-full bg-brand-card border border-brand-border rounded-xl py-4 pl-12 pr-4 text-sm focus:border-brand-accent focus:ring-1 focus:ring-brand-accent/30 outline-none transition-all placeholder:text-slate-600"
                 />
               </div>
-              <button className="w-full py-4 rounded-xl border border-dashed border-brand-border flex items-center justify-center gap-3 text-sm font-bold text-slate-muted hover:text-white hover:border-brand-yellow transition-all">
+              <button className="w-full py-4 rounded-xl border border-dashed border-brand-border flex items-center justify-center gap-3 text-sm font-bold text-slate-muted hover:text-white hover:border-brand-accent transition-all">
                 <UserPlus size={18} />
                 REGISTRAR NUEVO CLIENTE
               </button>
             </div>
             
-            <div className="p-6 bg-brand-yellow/5 border border-brand-yellow/20 rounded-2xl relative overflow-hidden">
+            <div className="p-6 bg-brand-accent/5 border border-brand-accent/20 rounded-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-2 opacity-10"><UserPlus size={48} /></div>
-                <h4 className="text-xs font-bold text-brand-yellow mb-1 tracking-widest uppercase">Info Rápida</h4>
+                <h4 className="text-xs font-bold text-brand-accent mb-1 tracking-widest uppercase">Info Rápida</h4>
                 <p className="text-xs text-slate-text leading-relaxed">Si el cliente ya existe, cargaremos automáticamente su historial de vehículos y servicios previos.</p>
             </div>
           </motion.div>
@@ -83,7 +83,7 @@ export function ReceptionForm() {
                           onClick={() => toggleService(service)}
                           className={`p-4 rounded-xl border transition-all flex items-center justify-between cursor-pointer ${
                             selectedServices.includes(service) 
-                              ? 'bg-brand-yellow border-brand-yellow text-brand-sidebar shadow-lg shadow-brand-yellow/10' 
+                              ? 'bg-brand-accent border-brand-accent text-brand-sidebar shadow-lg shadow-brand-accent/10' 
                               : 'bg-brand-card border-brand-border text-slate-text'
                           }`}
                         >
@@ -105,7 +105,7 @@ export function ReceptionForm() {
               <textarea 
                 rows={6} 
                 placeholder="Describe los síntomas, ruidos o fallas reportadas por el cliente..."
-                className="w-full bg-brand-card border border-brand-border rounded-xl p-4 text-sm focus:border-brand-yellow focus:ring-1 focus:ring-brand-yellow/30 outline-none transition-all placeholder:text-slate-600 resize-none h-40"
+                className="w-full bg-brand-card border border-brand-border rounded-xl p-4 text-sm focus:border-brand-accent focus:ring-1 focus:ring-brand-accent/30 outline-none transition-all placeholder:text-slate-600 resize-none h-40"
               />
             </div>
 
@@ -134,7 +134,7 @@ export function ReceptionForm() {
         )}
         <button 
           onClick={() => step < 3 ? setStep(s => s + 1) : null}
-          className={`flex-1 bg-brand-yellow text-brand-sidebar font-black py-4 rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl shadow-brand-yellow/20 text-xs ${step === 3 ? 'bg-brand-green text-white shadow-brand-green/20' : ''}`}
+          className={`flex-1 bg-brand-accent text-brand-sidebar font-black py-4 rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl shadow-brand-accent/20 text-xs ${step === 3 ? 'bg-brand-green text-white shadow-brand-green/20' : ''}`}
         >
           {step === 3 ? 'FINALIZAR REGISTRO' : 'CONTINUAR'}
           <ChevronRight size={18} />
@@ -143,7 +143,7 @@ export function ReceptionForm() {
 
       <style>{`
         .input-field {
-            @apply w-full bg-brand-card border border-brand-border rounded-xl py-4 px-4 text-sm focus:border-brand-yellow focus:ring-1 focus:ring-brand-yellow/30 outline-none transition-all placeholder:text-slate-600;
+            @apply w-full bg-brand-card border border-brand-border rounded-xl py-4 px-4 text-sm focus:border-brand-accent focus:ring-1 focus:ring-brand-accent/30 outline-none transition-all placeholder:text-slate-600;
         }
       `}</style>
     </div>

@@ -4,28 +4,33 @@
   --font-sans: "Helvetica Neue", Arial, sans-serif, ui-sans-serif, system-ui;
   --font-mono: "Courier New", Courier, monospace;
   
-  --color-brand-black: #0f172a; /* slate-900 */
-  --color-brand-sidebar: #020617; /* even darker slate */
-  --color-brand-card: #1e293b; /* slate-800 */
-  --color-brand-border: #334155; /* slate-700 */
-  --color-brand-red: #ef4444; /* red-500 */
+  --color-brand-black: #2d343c; /* A bit lighter than sidebar */
+  --color-brand-sidebar: #353F48; /* Carbon Gray official */
+  --color-brand-card: #3e4852; /* Lighter carbon */
+  --color-brand-border: #4a5a6a; 
+  --color-brand-accent: #DFC87C; /* Sand Gold official */
+  --color-brand-red: #ef4444; 
   --color-brand-red-light: #fca5a5;
   --color-brand-red-dark: #450a0a;
-  --color-brand-yellow: #facc15; /* yellow-400 */
-  --color-brand-yellow-dark: #422006;
-  --color-brand-green: #22c55e; /* green-500 */
+  --color-brand-yellow: #DFC87C; /* Replaced with brand gold */
+  --color-brand-yellow-dark: #423b24;
+  --color-brand-green: #22c55e;
   --color-brand-green-dark: #052e16;
   
-  --color-slate-muted: #94a3b8; /* slate-400 */
-  --color-slate-text: #f1f5f9; /* slate-100 */
+  --color-slate-muted: #94a3b8;
+  --color-slate-text: #f1f5f9;
 }
 
 body {
-  @apply bg-brand-black text-slate-text font-sans;
+  @apply bg-brand-sidebar text-slate-text font-sans;
 }
 
 .card {
-  @apply bg-brand-card border border-brand-border rounded-lg p-4 shadow-[0_4px_6px_rgba(0,0,0,0.3)];
+  @apply bg-brand-card border border-white/5 rounded-2xl p-4 shadow-xl;
+}
+
+.card-branded {
+  @apply bg-brand-card border border-brand-accent/20 rounded-2xl p-4 shadow-2xl;
 }
 
 .tag {

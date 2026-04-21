@@ -33,7 +33,7 @@ export function LegalValidation() {
       <div className="flex justify-between items-center bg-brand-sidebar p-6 rounded-2xl border border-brand-border">
         <div>
           <h2 className="text-2xl font-black italic text-white tracking-tighter uppercase">Validación Legal y Recepción</h2>
-          <p className="text-[10px] text-brand-yellow font-black uppercase tracking-widest mt-1">Acta de entrada y autorización del cliente</p>
+          <p className="text-[10px] text-brand-accent font-black uppercase tracking-widest mt-1">Acta de entrada y autorización del cliente</p>
         </div>
         <button 
           onClick={handlePrint}
@@ -48,7 +48,7 @@ export function LegalValidation() {
         {/* Inventario de Recepción */}
         <div className="card space-y-6 !bg-brand-sidebar/40">
           <div className="flex items-center gap-2 mb-4">
-             <ClipboardCheck className="text-brand-yellow" size={20} />
+             <ClipboardCheck className="text-brand-accent" size={20} />
              <h3 className="text-sm font-black uppercase tracking-widest text-white italic">Inventario de Entrada</h3>
           </div>
 
@@ -57,16 +57,16 @@ export function LegalValidation() {
             <div className="p-4 bg-black/30 rounded-2xl border border-brand-border">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 text-xs font-black uppercase tracking-tighter text-slate-400 italic">
-                  <Fuel size={14} className="text-brand-yellow" /> Nivel de Combustible
+                  <Fuel size={14} className="text-brand-accent" /> Nivel de Combustible
                 </div>
-                <span className="text-brand-yellow font-black italic">{fuelLevel}%</span>
+                <span className="text-brand-accent font-black italic">{fuelLevel}%</span>
               </div>
               <input 
                 type="range" 
                 min="0" max="100" step="12.5" 
                 value={fuelLevel}
                 onChange={(e) => setFuelLevel(parseInt(e.target.value))}
-                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-yellow"
+                className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-accent"
               />
               <div className="flex justify-between mt-2 text-[8px] font-black uppercase text-slate-600 tracking-widest italic">
                 <span>E</span>
@@ -89,7 +89,7 @@ export function LegalValidation() {
               <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest ml-1 italic">Notas de Daño Exterior (Rayones/Golpes)</label>
               <textarea 
                 placeholder="Describa rayones, golpes o detalles estéticos aquí..."
-                className="w-full bg-black/30 border border-brand-border rounded-2xl p-4 text-xs text-white focus:border-brand-yellow outline-none transition-all h-24 italic"
+                className="w-full bg-black/30 border border-brand-border rounded-2xl p-4 text-xs text-white focus:border-brand-accent outline-none transition-all h-24 italic"
               />
             </div>
           </div>
@@ -176,11 +176,11 @@ function CheckItem({ label, icon: Icon, active, onClick }: any) {
   return (
     <button 
       onClick={onClick}
-      className={`flex items-center gap-2 p-3 rounded-xl border transition-all ${active ? 'bg-brand-yellow/10 border-brand-yellow text-brand-yellow' : 'bg-black/20 border-brand-border text-slate-500'}`}
+      className={`flex items-center gap-2 p-3 rounded-xl border transition-all ${active ? 'bg-brand-accent/10 border-brand-accent text-brand-accent' : 'bg-black/20 border-brand-border text-slate-500'}`}
     >
       <Icon size={14} strokeWidth={active ? 3 : 2} />
       <span className="text-[10px] font-black uppercase tracking-tighter truncate italic">{label}</span>
-      <div className={`ml-auto w-2 h-2 rounded-full ${active ? 'bg-brand-yellow shadow-[0_0_8px_#FFD700]' : 'bg-slate-700'}`} />
+      <div className={`ml-auto w-2 h-2 rounded-full ${active ? 'bg-brand-accent shadow-[0_0_8px_#DFC87C]' : 'bg-slate-700'}`} />
     </button>
   );
 }

@@ -16,7 +16,7 @@ export function FinancialSummary() {
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl font-black italic text-white tracking-tighter uppercase">Cierre de Caja Diario</h2>
-        <p className="text-[10px] text-brand-yellow font-black uppercase tracking-widest mt-1">Análisis de rentabilidad hoy</p>
+        <p className="text-[10px] text-brand-accent font-black uppercase tracking-widest mt-1">Análisis de rentabilidad hoy</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -25,7 +25,7 @@ export function FinancialSummary() {
           value={formatCurrency(MOCK_DAILY_STATS.revenue)} 
           icon={Wallet} 
           trend="+12%" 
-          color="yellow"
+          color="accent"
         />
         <StatCard 
           label="Inversión Refacciones" 
@@ -54,7 +54,7 @@ export function FinancialSummary() {
         <div className="lg:col-span-2 card !bg-brand-sidebar/40 border-brand-border/50">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-sm font-black uppercase tracking-widest text-white italic">Servicios más Rentables</h3>
-            <button className="text-[10px] text-brand-yellow font-bold uppercase hover:underline flex items-center gap-1">
+            <button className="text-[10px] text-brand-accent font-bold uppercase hover:underline flex items-center gap-1">
               Ver reporte histórico <ArrowUpRight size={12} />
             </button>
           </div>
@@ -78,12 +78,12 @@ export function FinancialSummary() {
                initial={{ width: 0 }}
                animate={{ width: '72%' }}
                transition={{ duration: 1.5, ease: "easeOut" }}
-               className="h-full bg-gradient-to-r from-brand-red to-brand-yellow"
+               className="h-full bg-gradient-to-r from-brand-red to-brand-accent"
              />
           </div>
           <div className="flex justify-between w-full mt-2 text-[10px] font-black uppercase tracking-widest italic">
              <span className="text-slate-600">$0</span>
-             <span className="text-brand-yellow">$150,000 MXN</span>
+             <span className="text-brand-accent">$150,000 MXN</span>
           </div>
         </div>
       </div>
@@ -93,7 +93,7 @@ export function FinancialSummary() {
 
 function StatCard({ label, value, icon: Icon, trend, color }: any) {
   const colors: any = {
-    yellow: 'text-brand-yellow bg-brand-yellow/10 border-brand-yellow/20',
+    accent: 'text-brand-accent bg-brand-accent/10 border-brand-accent/20',
     green: 'text-brand-green bg-brand-green/10 border-brand-green/20',
     red: 'text-brand-red bg-brand-red/10 border-brand-red/20',
     slate: 'text-slate-400 bg-slate-800 border-brand-border'
@@ -120,10 +120,10 @@ function ProfitRow({ label, profit, margin }: any) {
   return (
     <div className="flex items-center justify-between group">
       <div>
-        <p className="text-sm font-bold text-white group-hover:text-brand-yellow transition-colors">{label}</p>
+        <p className="text-sm font-bold text-white group-hover:text-brand-accent transition-colors">{label}</p>
         <div className="flex items-center gap-2 mt-0.5">
            <div className="w-20 h-1 bg-slate-800 rounded-full overflow-hidden">
-              <div className="h-full bg-brand-yellow/40" style={{ width: `${margin}%` }} />
+              <div className="h-full bg-brand-accent/40" style={{ width: `${margin}%` }} />
            </div>
            <span className="text-[10px] font-bold text-slate-500">{margin}% margen</span>
         </div>

@@ -33,13 +33,13 @@ export function ProformaInvoice() {
       <div className="flex justify-between items-center bg-brand-sidebar p-6 rounded-2xl border border-brand-border">
          <div>
             <h2 className="text-2xl font-black italic text-white tracking-tighter uppercase">Factura Proforma</h2>
-            <p className="text-[10px] text-brand-yellow font-black uppercase tracking-widest mt-1">Presupuesto sujeto a vigencia por 5 días</p>
+            <p className="text-[10px] text-brand-accent font-black uppercase tracking-widest mt-1">Presupuesto sujeto a vigencia por 5 días</p>
          </div>
          <div className="flex gap-3">
             <button className="p-3 bg-slate-800 rounded-xl text-slate-400 hover:text-white transition-colors border border-brand-border">
                <Printer size={20} />
             </button>
-            <button className="p-3 bg-brand-yellow rounded-xl text-brand-sidebar shadow-lg shadow-brand-yellow/10 active:scale-95 transition-all">
+            <button className="p-3 bg-brand-accent rounded-xl text-brand-sidebar shadow-lg shadow-brand-accent/10 active:scale-95 transition-all">
                <Download size={20} strokeWidth={3} />
             </button>
          </div>
@@ -51,7 +51,7 @@ export function ProformaInvoice() {
            <div className="space-y-4">
               <div className="flex items-center gap-2">
                  <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-                    <Wrench className="text-brand-yellow" size={20} />
+                    <Wrench className="text-brand-accent" size={20} />
                  </div>
                  <h1 className="font-black text-xl italic tracking-tighter uppercase">SERVICIO AUTOMOTRIZ EL GRILLO</h1>
               </div>
@@ -154,7 +154,7 @@ export function ProformaInvoice() {
         </div>
 
         {/* Industrial background accent */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-yellow/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-accent/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
       </div>
     </div>
   );
