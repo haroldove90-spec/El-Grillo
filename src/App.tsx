@@ -20,12 +20,17 @@ import {
   Bell,
   Settings,
   PlusSquare,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { KanbanBoard } from './components/KanbanBoard';
 import { ReceptionForm } from './components/ReceptionForm';
 import { InspectionTool } from './components/InspectionTool';
+import { InventoryTable } from './components/InventoryTable';
+import { FinancialSummary } from './components/FinancialSummary';
+import { ProformaInvoice } from './components/ProformaInvoice';
+import { LegalValidation } from './components/LegalValidation';
 
 // --- Components ---
 
@@ -40,7 +45,7 @@ const SidebarItem = ({ icon: Icon, label, active = false, onClick }: { icon: any
 );
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'recepcion' | 'inspeccion'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'recepcion' | 'inspeccion' | 'inventario' | 'finanzas' | 'presupuesto' | 'autorizacion'>('dashboard');
 
   return (
     <div className="flex h-screen bg-brand-black overflow-hidden font-sans">
@@ -64,11 +69,16 @@ export default function App() {
           </div>
           
           <div className="pt-6 border-t border-brand-border/50">
-            <div className="text-[10px] uppercase font-black text-slate-700 mb-4 tracking-widest italic">Operaciones</div>
-            <SidebarItem label="Inventario" icon={Package} />
-            <SidebarItem label="Vehículos" icon={Car} />
+            <div className="text-[10px] uppercase font-black text-slate-700 mb-4 tracking-widest italic">Administración</div>
+            <SidebarItem label="Finanzas" active={activeTab === 'finanzas'} onClick={() => setActiveTab('finanzas')} icon={TrendingUp} />
+            <SidebarItem label="Presupuesto" active={activeTab === 'presupuesto'} onClick={() => setActiveTab('presupuesto')} icon={ClipboardList} />
+            <SidebarItem label="Inventario" active={activeTab === 'inventario'} onClick={() => setActiveTab('inventario')} icon={Package} />
+          </div>
+          
+          <div className="pt-6 border-t border-brand-border/50">
+            <div className="text-[10px] uppercase font-black text-slate-700 mb-4 tracking-widest italic">Legal</div>
+            <SidebarItem label="Validación" active={activeTab === 'autorizacion'} onClick={() => setActiveTab('autorizacion')} icon={Shield} />
             <SidebarItem label="Personal" icon={Users} />
-            <SidebarItem label="Reportes" icon={TrendingUp} />
           </div>
         </nav>
 
@@ -86,9 +96,14 @@ export default function App() {
       {/* Main Content */}
       <main className="flex-1 overflow-hidden flex flex-col relative bg-brand-black">
         {/* Header Overlay (for Desktop Desktop) */}
-        <header className="h-20 flex items-center justify-between px-10 z-10">
+        <header className=" h-20 flex items-center justify-between px-10 z-10">
           <h2 className="text-2xl font-black italic text-white tracking-tighter uppercase">
-            {activeTab === 'dashboard' ? 'Panel de Control' : activeTab === 'recepcion' ? 'Nueva Recepción' : 'Inspección Semáforo'}
+            {activeTab === 'dashboard' ? 'Panel de Control' : 
+             activeTab === 'recepcion' ? 'Nueva Recepción' : 
+             activeTab === 'inspeccion' ? 'Inspección Semáforo' : 
+             activeTab === 'inventario' ? 'Gestión Inventario' :
+             activeTab === 'finanzas' ? 'Cierre Financiero' : 
+             activeTab === 'autorizacion' ? 'Protección Legal' : 'Presupuesto Proforma'}
           </h2>
           
           <div className="flex items-center gap-6">
@@ -129,7 +144,7 @@ export default function App() {
               >
                 <ReceptionForm />
               </motion.div>
-            ) : (
+            ) : activeTab === 'inspeccion' ? (
               <motion.div 
                 key="inspeccion"
                 initial={{ opacity: 0, y: 10 }}
@@ -138,6 +153,46 @@ export default function App() {
                 className="h-full"
               >
                 <InspectionTool />
+              </motion.div>
+            ) : activeTab === 'inventario' ? (
+              <motion.div 
+                key="inventario"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="h-full"
+              >
+                <InventoryTable />
+              </motion.div>
+            ) : activeTab === 'finanzas' ? (
+              <motion.div 
+                key="finanzas"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="h-full"
+              >
+                <FinancialSummary />
+              </motion.div>
+            ) : activeTab === 'autorizacion' ? (
+              <motion.div 
+                key="autorizacion"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="h-full"
+              >
+                <LegalValidation />
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="presupuesto"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="h-full"
+              >
+                <ProformaInvoice />
               </motion.div>
             )}
           </AnimatePresence>
