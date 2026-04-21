@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, UserPlus, Car, CheckSquare, FileText, ChevronRight, Phone, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { Search, UserPlus, Car, CheckSquare, FileText, ChevronRight, Phone, CheckCircle2, Loader2, AlertCircle, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { db } from '../services/db';
 

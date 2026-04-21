@@ -149,23 +149,23 @@ export default function App() {
 
           <nav className="space-y-4 flex-1">
             <div className="space-y-1">
-              <SidebarItem label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} icon={LayoutDashboard} />
-              <SidebarItem label="Recepción" active={activeTab === 'recepcion'} onClick={() => setActiveTab('recepcion')} icon={PlusSquare} />
-              <SidebarItem label="Inspección" active={activeTab === 'inspeccion'} onClick={() => setActiveTab('inspeccion')} icon={ClipboardList} />
+              <SidebarItem label="Dashboard" active={activeTab === 'dashboard'} onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }} icon={LayoutDashboard} />
+              <SidebarItem label="Recepción" active={activeTab === 'recepcion'} onClick={() => { setActiveTab('recepcion'); setIsSidebarOpen(false); }} icon={PlusSquare} />
+              <SidebarItem label="Inspección" active={activeTab === 'inspeccion'} onClick={() => { setActiveTab('inspeccion'); setIsSidebarOpen(false); }} icon={ClipboardList} />
             </div>
             
             <div className="pt-6 border-t border-brand-border/50">
               <div className="text-[10px] uppercase font-black text-slate-700 mb-4 tracking-widest italic">Administración</div>
-              <SidebarItem label="Finanzas" active={activeTab === 'finanzas'} onClick={() => setActiveTab('finanzas')} icon={TrendingUp} />
-              <SidebarItem label="Presupuesto" active={activeTab === 'presupuesto'} onClick={() => setActiveTab('presupuesto')} icon={ClipboardList} />
-              <SidebarItem label="Inventario" active={activeTab === 'inventario'} onClick={() => setActiveTab('inventario')} icon={Package} />
+              <SidebarItem label="Finanzas" active={activeTab === 'finanzas'} onClick={() => { setActiveTab('finanzas'); setIsSidebarOpen(false); }} icon={TrendingUp} />
+              <SidebarItem label="Presupuesto" active={activeTab === 'presupuesto'} onClick={() => { setActiveTab('presupuesto'); setIsSidebarOpen(false); }} icon={ClipboardList} />
+              <SidebarItem label="Inventario" active={activeTab === 'inventario'} onClick={() => { setActiveTab('inventario'); setIsSidebarOpen(false); }} icon={Package} />
             </div>
             
             <div className="pt-6 border-t border-brand-border/50">
               <div className="text-[10px] uppercase font-black text-slate-700 mb-4 tracking-widest italic">Legal & Entrega</div>
-              <SidebarItem label="Validación" active={activeTab === 'autorizacion'} onClick={() => setActiveTab('autorizacion')} icon={Shield} />
-              <SidebarItem label="Certificado" active={activeTab === 'certificado'} onClick={() => setActiveTab('certificado')} icon={Award} />
-              <SidebarItem label="Personal" icon={Users} />
+              <SidebarItem label="Validación" active={activeTab === 'autorizacion'} onClick={() => { setActiveTab('autorizacion'); setIsSidebarOpen(false); }} icon={Shield} />
+              <SidebarItem label="Certificado" active={activeTab === 'certificado'} onClick={() => { setActiveTab('certificado'); setIsSidebarOpen(false); }} icon={Award} />
+              <SidebarItem label="Personal" icon={Users} onClick={() => setIsSidebarOpen(false)} />
             </div>
           </nav>
 

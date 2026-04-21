@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Banknote, MapPin, MessageSquare, ExternalLink, Share2, MoreVertical, Edit2, Trash2, Loader2, Gauge, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { CreditCard, Banknote, MapPin, MessageSquare, ExternalLink, Share2, MoreVertical, Trash2, Loader2, Gauge, ShieldCheck, CheckCircle2, Clock, Search, Wrench, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatMexicanPhone, generateWhatsAppMessage } from '../utils/mechanicsLogic';
 import { db } from '../services/db';
@@ -33,6 +33,7 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
   const [loading, setLoading] = useState(true);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [finalizingOrderId, setFinalizingOrderId] = useState<string | null>(null);
+  const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
 
   const fetchOrders = async () => {
     try {
@@ -43,12 +44,12 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
         id: o.id,
         orderNumber: o.order_number.toString(),
         client: `${o.vehicles?.clients?.first_name} ${o.vehicles?.clients?.last_name}`,
-        phone: o.vehicles?.clients?.phone,
+        phone: o.vehicles?.clients?.phone || '',
         vehicle: `${o.vehicles?.make} ${o.vehicles?.model}`,
-        plate: o.vehicles?.license_plate,
+        plate: o.vehicles?.license_plate || 'S/P',
         paymentType: o.apply_iva ? 'Card' : 'Cash',
         status: o.status as ServiceStatus,
-        total: o.total_amount,
+        total: o.total_amount || 0,
         services: o.notes ? [o.notes] : ['Servicio General']
       }));
       
@@ -71,6 +72,7 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
         return;
       }
       await db.orders.updateStatus(orderId, newStatus);
+      // Immediate reflection in UI
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
     } catch (err) {
       alert('Error al actualizar el estatus');
@@ -91,11 +93,12 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
     }
   };
 
-  const handleDelete = async (orderId: string) => {
-    if (!window.confirm('¿Estás seguro de eliminar esta orden?')) return;
+  const handleDelete = async (order: Order) => {
+    if (!window.confirm(`¿Estás seguro de eliminar la orden del vehículo [${order.plate}]?`)) return;
     try {
-      await db.orders.delete(orderId);
-      setOrders(prev => prev.filter(o => o.id !== orderId));
+      await db.orders.delete(order.id);
+      setOrders(prev => prev.filter(o => o.id !== order.id));
+      setActiveMenu(null);
     } catch (err) {
       alert('Error al eliminar la orden');
     }
@@ -153,7 +156,8 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   key={order.id}
-                  className="card !p-5 group relative overflow-hidden border border-brand-border/50 hover:border-brand-accent/50 shadow-2xl transition-all"
+                  onClick={() => setViewingOrder(order)}
+                  className="card !p-5 group relative overflow-hidden border border-brand-border/50 hover:border-brand-accent/50 shadow-2xl transition-all cursor-pointer"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-2">
@@ -161,7 +165,7 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
                     </div>
                     <div className="relative">
                        <button 
-                         onClick={() => setActiveMenu(activeMenu === order.id ? null : order.id)}
+                         onClick={(e) => { e.stopPropagation(); setActiveMenu(activeMenu === order.id ? null : order.id) }}
                          className="p-1.5 rounded-xl bg-brand-sidebar border border-brand-border text-slate-muted hover:text-white transition-all shadow-inner"
                        >
                          <MoreVertical size={14} />
@@ -175,11 +179,14 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
                              exit={{ opacity: 0, scale: 0.9, y: -10 }}
                              className="absolute right-0 top-10 w-44 bg-brand-sidebar border border-brand-border rounded-2xl shadow-2xl z-20 py-2 divide-y divide-brand-border/30 overflow-hidden"
                            >
-                              <button className="w-full px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-muted hover:text-white hover:bg-white/5 flex items-center gap-3 transition-colors">
-                                <Edit2 size={12} /> Editar Orden
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); setViewingOrder(order); setActiveMenu(null); }}
+                                className="w-full px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-muted hover:text-white hover:bg-white/5 flex items-center gap-3 transition-colors"
+                              >
+                                <ExternalLink size={12} /> Ver Detalles
                               </button>
                               <button 
-                                onClick={() => handleDelete(order.id)}
+                                onClick={(e) => { e.stopPropagation(); handleDelete(order); }}
                                 className="w-full px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-brand-red hover:bg-brand-red/10 flex items-center gap-3 transition-colors"
                               >
                                 <Trash2 size={12} /> Eliminar
@@ -199,7 +206,7 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
                   </div>
 
                   {/* Status Bar */}
-                  <div className="flex gap-1.5 mb-5 overflow-x-auto pb-1 custom-scrollbar-h">
+                  <div className="flex gap-1.5 mb-5 overflow-x-auto pb-1 custom-scrollbar-h" onClick={(e) => e.stopPropagation()}>
                     {COLUMNS.map(c => (
                       <button 
                         key={c.label}
@@ -228,7 +235,7 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
                     </div>
                     
                     <button 
-                      onClick={() => handleWhatsAppAction(order)}
+                      onClick={(e) => { e.stopPropagation(); handleWhatsAppAction(order); }}
                       className="flex items-center gap-2 bg-brand-accent text-brand-sidebar py-2 px-4 rounded-xl text-[9px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-accent/20"
                     >
                       <MessageSquare size={14} strokeWidth={3} />
@@ -236,7 +243,6 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
                     </button>
                   </div>
 
-                  {/* Decorative status gradient line */}
                   <div className={`absolute top-0 right-0 w-1.5 h-full ${
                     order.status === 'Listo' ? 'bg-brand-green' : 
                     order.status === 'En Reparacion' ? 'bg-brand-red' : 
@@ -258,7 +264,88 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
         </div>
       ))}
 
-      {/* Signature Modal */}
+      {/* Order Details Modal */}
+      <AnimatePresence>
+        {viewingOrder && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setViewingOrder(null)} className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+             <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative bg-brand-sidebar border border-brand-border w-full max-w-2xl rounded-[3rem] p-10 shadow-2xl overflow-y-auto max-h-[90vh] custom-scrollbar">
+                <div className="flex justify-between items-start mb-8">
+                   <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 rounded-2xl bg-brand-accent/10 flex items-center justify-center text-brand-accent">
+                         <FileText size={32} />
+                      </div>
+                      <div>
+                         <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter leading-none">Orden #{viewingOrder.orderNumber}</h3>
+                         <p className="text-[10px] text-brand-accent font-black uppercase tracking-widest mt-2">{viewingOrder.status} - El Grillo Automotriz</p>
+                      </div>
+                   </div>
+                   <button onClick={() => setViewingOrder(null)} className="p-2 rounded-xl bg-white/5 text-slate-muted hover:text-white"><Trash2 size={24} className="rotate-45" /></button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8 mb-8">
+                   <div className="space-y-4">
+                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Cliente y Contacto</p>
+                      <div className="p-4 bg-brand-black/40 rounded-2xl border border-brand-border">
+                         <p className="text-sm font-black text-white italic uppercase">{viewingOrder.client}</p>
+                         <p className="text-xs text-brand-accent font-bold mt-1">{viewingOrder.phone}</p>
+                      </div>
+                   </div>
+                   <div className="space-y-4">
+                      <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Vehículo Registrado</p>
+                      <div className="p-4 bg-brand-black/40 rounded-2xl border border-brand-border">
+                         <p className="text-sm font-black text-white italic uppercase">{viewingOrder.vehicle}</p>
+                         <p className="text-xs text-brand-red font-bold mt-1 uppercase tracking-widest">Placas: {viewingOrder.plate}</p>
+                      </div>
+                   </div>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                   <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Servicios y Diagnóstico</p>
+                   <div className="p-6 bg-brand-black/40 rounded-2xl border border-brand-border min-h-[120px]">
+                      <ul className="space-y-3">
+                         {viewingOrder.services.map((s, idx) => (
+                            <li key={idx} className="flex gap-3 text-xs text-slate-300 font-medium leading-relaxed italic">
+                               <div className="w-1.5 h-1.5 rounded-full bg-brand-accent shrink-0 mt-1.5" />
+                               {s}
+                            </li>
+                         ))}
+                      </ul>
+                   </div>
+                </div>
+
+                <div className="flex items-center justify-between p-6 bg-brand-accent/5 border border-brand-accent/20 rounded-2xl">
+                   <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-brand-accent/10 flex items-center justify-center text-brand-accent"><CreditCard size={20} /></div>
+                      <div>
+                         <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Presupuesto Estimado</p>
+                         <p className="text-xl font-black text-brand-green italic">${viewingOrder.total.toLocaleString()}</p>
+                      </div>
+                   </div>
+                   <button 
+                     onClick={() => handleWhatsAppAction(viewingOrder)}
+                     className="bg-brand-accent text-brand-sidebar px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-accent/10"
+                   >
+                     RE-NOTIFICAR CLIENTE
+                   </button>
+                </div>
+
+                {/* Photos Simulation */}
+                <div className="mt-8 space-y-4">
+                   <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Evidencia Fotográfica</p>
+                   <div className="grid grid-cols-3 gap-4">
+                      {[1,2,3].map(i => (
+                        <div key={i} className="aspect-video bg-white/5 rounded-xl border border-brand-border flex items-center justify-center overflow-hidden relative group">
+                           <img src={`https://picsum.photos/seed/grillo${i}/400/300`} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      ))}
+                   </div>
+                </div>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
       <AnimatePresence>
         {finalizingOrderId && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">

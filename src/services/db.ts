@@ -1,7 +1,7 @@
 import { getSupabase } from '../lib/supabase';
 
 // Generic CRUD operations wrapper to include error logging
-const handleSupabase = async (operation: Promise<any>) => {
+const handleSupabase = async (operation: any) => {
   try {
     const { data, error } = await operation;
     if (error) {
