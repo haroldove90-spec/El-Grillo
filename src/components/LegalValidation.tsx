@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
-import { Shield, Smartphone, PenTool, ClipboardCheck, Fuel, Radio, LifeBuoy, Wrench, Printer, Send } from 'lucide-react';
+import { Shield, Smartphone, PenTool, ClipboardCheck, Fuel, Radio, LifeBuoy, Wrench, Printer, Send, CheckCircle2 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { formatMexicanPhone, generateWhatsAppMessage } from '../utils/mechanicsLogic';
 
 export function LegalValidation() {
   const sigCanvas = useRef<SignatureCanvas>(null);
@@ -13,15 +14,47 @@ export function LegalValidation() {
     tools: true
   });
   const [signatureData, setSignatureData] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const clearSignature = () => {
     sigCanvas.current?.clear();
     setSignatureData(null);
   };
 
-  const saveSignature = () => {
-    if (sigCanvas.current?.isEmpty()) return;
-    setSignatureData(sigCanvas.current?.getTrimmedCanvas().toDataURL('image/png') || null);
+  const saveAndNotify = () => {
+    if (sigCanvas.current?.isEmpty()) {
+      alert("Por favor, capture la firma del cliente antes de continuar.");
+      return;
+    }
+
+    setIsSaving(true);
+    
+    // Convertir firma a imagen
+    const signatureImage = sigCanvas.current?.getTrimmedCanvas().toDataURL('image/png') || null;
+    setSignatureData(signatureImage);
+
+    // Simular guardado en Supabase
+    setTimeout(() => {
+      setIsSaving(false);
+      setShowSuccess(true);
+
+      // Disparar WhatsApp automáticamente
+      const mockOrderData = {
+        client: 'ARTURO HERNÁNDEZ',
+        vehicle: 'VOLKSWAGEN JETTA 2014',
+        status: 'FIRMADO Y RECIBIDO',
+        services: ['Recepción e Inventario'],
+        total: 0,
+        orderNumber: '2045'
+      };
+
+      const phone = formatMexicanPhone('5512345678');
+      const message = generateWhatsAppMessage(mockOrderData) + "\n\n✅ *La orden ha sido firmada digitalmente y el vehículo está en resguardo.*";
+      const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      
+      window.open(waUrl, '_blank');
+    }, 1500);
   };
 
   const handlePrint = () => {
@@ -29,8 +62,10 @@ export function LegalValidation() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-20">
-      <div className="flex justify-between items-center bg-brand-sidebar p-6 rounded-2xl border border-brand-border">
+    <div className="max-w-4xl mx-auto space-y-8 pb-20 p-8 border-4 border-brand-accent/30 rounded-[2.5rem] bg-brand-sidebar shadow-2xl relative overflow-hidden group/tablet">
+      <div className="absolute top-0 inset-x-0 h-1 bg-brand-accent/20"></div>
+      
+      <div className="flex justify-between items-center bg-black/20 p-6 rounded-2xl border border-brand-border">
         <div>
           <h2 className="text-2xl font-black italic text-white tracking-tighter uppercase">Validación Legal y Recepción</h2>
           <p className="text-[10px] text-brand-accent font-black uppercase tracking-widest mt-1">Acta de entrada y autorización del cliente</p>
@@ -43,6 +78,20 @@ export function LegalValidation() {
           Imprimir Ticket
         </button>
       </div>
+
+      {showSuccess && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-brand-green/10 border border-brand-green/30 p-4 rounded-2xl flex items-center gap-4 text-brand-green"
+        >
+          <CheckCircle2 size={24} />
+          <div>
+            <p className="text-sm font-black uppercase tracking-widest leading-none">¡Registro Guardado!</p>
+            <p className="text-[10px] font-bold mt-1 uppercase opacity-80">La firma se ha guardado y se ha enviado la notificación por WhatsApp.</p>
+          </div>
+        </motion.div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Inventario de Recepción */}
@@ -103,41 +152,47 @@ export function LegalValidation() {
                <h3 className="text-sm font-black uppercase tracking-widest text-brand-sidebar italic">Firma de Autorización</h3>
             </div>
 
-            <div className="border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden bg-slate-50">
+            <div className="border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden bg-slate-100/50 group-hover:border-brand-accent transition-all">
                <SignatureCanvas 
                   ref={sigCanvas}
-                  penColor="black"
+                  penColor="#DFC87C"
                   canvasProps={{
                     className: 'w-full h-48 cursor-crosshair'
                   }}
-                  onEnd={saveSignature}
                />
             </div>
 
             <div className="flex justify-between gap-4">
               <button 
                 onClick={clearSignature}
-                className="flex-1 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 bg-slate-100 hover:bg-slate-200 transition-colors"
+                className="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 border border-slate-200 hover:bg-slate-50 transition-all active:scale-95"
               >
-                Limpiar Lienzo
+                Limpiar Firma
               </button>
-              <button className="flex-1 py-3 bg-brand-sidebar text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-2 active:scale-95 transition-all">
-                <Send size={14} /> Guardar Registro
+              <button 
+                onClick={saveAndNotify}
+                disabled={isSaving}
+                className="flex-1 py-4 bg-brand-accent text-brand-sidebar rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl flex items-center justify-center gap-2 active:scale-95 transition-all shadow-brand-accent/20 disabled:opacity-50 disabled:active:scale-100"
+              >
+                {isSaving ? (
+                  <div className="w-5 h-5 border-2 border-brand-sidebar/30 border-t-brand-sidebar rounded-full animate-spin"></div>
+                ) : (
+                  <Send size={14} strokeWidth={3} />
+                )}
+                {isSaving ? 'GUARDANDO...' : 'Guardar y Finalizar'}
               </button>
             </div>
           </div>
 
-          <div className="card !bg-brand-red/5 !border-brand-red/20">
+          <div className="card-branded !bg-brand-accent/5 border-brand-accent/20">
              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-brand-red/10 flex items-center justify-center text-brand-red shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-brand-accent/10 flex items-center justify-center text-brand-accent shrink-0">
                    <Shield size={20} />
                 </div>
                 <div className="space-y-2">
-                   <h4 className="text-[10px] font-black text-brand-red uppercase tracking-widest italic">Cláusula Legal</h4>
+                   <h4 className="text-[10px] font-black text-brand-accent uppercase tracking-widest italic">Aviso de Confianza</h4>
                    <p className="text-[9px] text-slate-muted font-bold leading-relaxed uppercase tracking-tight italic">
-                     EL CLIENTE AUTORIZA EL DIAGNÓSTICO DEL VEHÍCULO Y LAS PRUEBAS DE MANEJO NECESARIAS. 
-                     EL TALLER NO SE HACE RESPONSABLE POR OBJETOS DE VALOR NO DECLARADOS EN ESTE ACTA. 
-                     ACEPTO QUE MIS DATOS SEAN USADOS PARA EL SEGUIMIENTO DE MI SERVICIO.
+                     Al firmar, el cliente autoriza a Servicio Automotriz El Grillo a realizar el diagnóstico y las pruebas de ruta necesarias. Se hace constar que el taller no se hace responsable por objetos de valor no declarados en el inventario de recepción. El cliente acepta que el presupuesto proporcionado es una estimación sujeta a cambios tras el desarmado o hallazgos adicionales, previa autorización vía WhatsApp.
                    </p>
                 </div>
              </div>
