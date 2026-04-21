@@ -1,6 +1,6 @@
 /* 
-  EL GRILLO - SCRIPT DE POBLAMIENTO INICIAL (ALINEADO CON UI)
-  Copia este bloque y pégalo en el SQL Editor de tu consola de Supabase.
+  EL GRILLO - SCRIPT DE POBLAMIENTO DEFINITIVO
+  Carga estos datos para ver las métricas y columnas llenas.
 */
 
 -- 1. Clientes
@@ -30,32 +30,32 @@ INSERT INTO vehicles (client_id, make, model, year, license_plate, color, vin) V
 ((SELECT id FROM clients WHERE phone = '5501234567'), 'Kia', 'Rio', 2023, 'KIA-23-RIO', 'Plata', 'KA444555666');
 
 -- 3. Órdenes de Servicio
+-- Recepcion
 INSERT INTO service_orders (vehicle_id, order_number, status, total_amount, notes, apply_iva) VALUES
 ((SELECT id FROM vehicles WHERE license_plate = 'PXD-45-21'), 1001, 'Recepcion', 1500.00, 'Falla en alternador - no carga batería. Revisión de diodos.', true),
-((SELECT id FROM vehicles WHERE license_plate = 'GBK-88-18'), 1002, 'Diagnostico', 2450.00, 'Cambio de balatas delanteras y rectificado de discos.', false),
-((SELECT id FROM vehicles WHERE license_plate = 'TX-90-TRK'), 1003, 'En Reparacion', 8900.00, 'Fuga de refrigerante en A/C. Cambio de mangueras y carga de gas.', true),
-((SELECT id FROM vehicles WHERE license_plate = 'HND-20-Civ'), 1004, 'Listo', 3200.00, 'Afinación mayor, limpieza de cuerpo de aceleración y cambio de bujías.', true),
 ((SELECT id FROM vehicles WHERE license_plate = 'TCM-19-XP'), 1005, 'Recepcion', 1200.00, 'Cambio de aceite sintético 5W30 y filtro de aceite original.', false),
-((SELECT id FROM vehicles WHERE license_plate = 'GTI-07-VW'), 1006, 'Diagnostico', 4500.00, 'Ruido metálico en suspensión delantera derecha al girar.', true),
+((SELECT id FROM vehicles WHERE license_plate = 'JP-4X4-RC'), 1009, 'Recepcion', 500.00, 'Lavado detallado de motor con desengrasante biodegradable.', false);
+
+-- Diagnostico
+INSERT INTO service_orders (vehicle_id, order_number, status, total_amount, notes, apply_iva) VALUES
+((SELECT id FROM vehicles WHERE license_plate = 'GBK-88-18'), 1002, 'Diagnostico', 2450.00, 'Cambio de balatas delanteras y rectificado de discos.', false),
+((SELECT id FROM vehicles WHERE license_plate = 'GTI-07-VW'), 1006, 'Diagnostico', 4500.00, 'Ruido metálico en suspensión delantera derecha al girar.', true);
+
+-- En Reparacion
+INSERT INTO service_orders (vehicle_id, order_number, status, total_amount, notes, apply_iva) VALUES
+((SELECT id FROM vehicles WHERE license_plate = 'TX-90-TRK'), 1003, 'En Reparacion', 8900.00, 'Fuga de refrigerante en A/C. Cambio de mangueras y carga de gas.', true),
 ((SELECT id FROM vehicles WHERE license_plate = 'NSN-22-MX'), 1007, 'En Reparacion', 12500.00, 'Sobrecalentamiento motor. Rectificado de cabeza y juntas nuevas.', true),
-((SELECT id FROM vehicles WHERE license_plate = 'BMW-33-I'), 1008, 'Listo', 6800.00, 'Servicio de mantenimiento por kilometraje (Check de 50 puntos).', true),
-((SELECT id FROM vehicles WHERE license_plate = 'JP-4X4-RC'), 1009, 'Recepcion', 500.00, 'Lavado detallado de motor con desengrasante biodegradable.', false),
 ((SELECT id FROM vehicles WHERE license_plate = 'KIA-23-RIO'), 1010, 'En Reparacion', 2800.00, 'Instalación de kit de sensores de reversa y cámara.', true);
 
--- 4. Inventario (Alineado con InventoryItem interface)
+-- Listo
+INSERT INTO service_orders (vehicle_id, order_number, status, total_amount, notes, apply_iva) VALUES
+((SELECT id FROM vehicles WHERE license_plate = 'HND-20-Civ'), 1004, 'Listo', 3200.00, 'Afinación mayor, limpieza de cuerpo de aceleración y cambio de bujías.', true),
+((SELECT id FROM vehicles WHERE license_plate = 'BMW-33-I'), 1008, 'Listo', 6800.00, 'Servicio de mantenimiento por kilometraje (Check de 50 puntos).', true);
+
+-- 4. Inventario
 INSERT INTO inventory (part_name, sku, quantity, unit_price, reorder_level, category) VALUES
 ('Aceite Sintético 5W30 (L)', 'OIL-5W30-S', 45, 185.00, 10, 'Lubricantes'),
 ('Bujía Iridium Ngk Laser', 'BJR-IRD-7', 8, 220.00, 12, 'Encendido'),
 ('Filtro de Aire Universal MK', 'FLT-AIR-01', 25, 340.00, 5, 'Filtros'),
 ('Líquido de Frenos Dot4 (500ml)', 'BRK-LIQ-4', 12, 145.00, 10, 'Líquidos'),
-('Banda de Accesorios Poly-V', 'BND-ACC-VW', 3, 450.00, 5, 'Transmisión'),
-('Filtro de Aceite Fram PH', 'FLT-OIL-PH1', 50, 110.00, 10, 'Filtros'),
-('Anticongelante Rosa 50/50 (Gal)', 'ANT-PNK-50', 18, 280.00, 6, 'Líquidos'),
-('Balatas Delanteras Carboceramic', 'BLT-JET-FR', 5, 890.00, 4, 'Frenos'),
-('Batería LTH Pro 750', 'BAT-LTH-75', 4, 2100.00, 2, 'Eléctrico'),
-('Limpiaparabrisas Bosch 22"', 'WPR-22-EL', 30, 140.00, 10, 'Accesorios'),
-('Kit Foco Led H7 6000K', 'LED-H7-W', 2, 750.00, 4, 'Iluminación'),
-('Sensor de Oxígeno Denso', 'SNS-O2-UNI', 1, 1200.00, 2, 'Electrónica'),
-('Amortiguador Monroe Gas-Magnum', 'AMT-FR-G7', 1, 3200.00, 2, 'Suspensión'),
-('Termostato 88C Gates', 'TRM-88', 15, 480.00, 5, 'Enfriamiento'),
-('Tapón de Radiador 16lb ACDelco', 'TPN-RAD-16', 20, 120.00, 5, 'Enfriamiento');
+('Banda de Accesorios Poly-V', 'BND-ACC-VW', 3, 450.00, 5, 'Transmisión');

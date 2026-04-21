@@ -134,10 +134,43 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
   }
 
   return (
-    <div className="flex gap-4 lg:gap-6 h-full overflow-x-auto pb-6 pt-2 custom-scrollbar-h">
-      {COLUMNS.map((col) => (
-        <div key={col.label} className="flex-shrink-0 w-[300px] lg:w-80 flex flex-col h-full">
-          <div className="flex items-center justify-between mb-6 px-2">
+    <div className="flex flex-col h-full space-y-8">
+      {/* Dashboard Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 shrink-0">
+        <StatCard 
+          label="Total Órdenes" 
+          value={orders.length} 
+          icon={FileText} 
+          color="text-brand-accent"
+          bgColor="bg-brand-accent/5"
+        />
+        <StatCard 
+          label="Vehículos en Piso" 
+          value={orders.filter(o => o.status !== 'Entregado').length} 
+          icon={Clock} 
+          color="text-brand-yellow"
+          bgColor="bg-brand-yellow/5"
+        />
+        <StatCard 
+          label="Por Entregar (Listos)" 
+          value={orders.filter(o => o.status === 'Listo').length} 
+          icon={CheckCircle2} 
+          color="text-brand-green"
+          bgColor="bg-brand-green/5"
+        />
+        <StatCard 
+          label="Ingresos Estimados" 
+          value={`$${orders.reduce((acc, o) => acc + o.total, 0).toLocaleString()}`} 
+          icon={CreditCard} 
+          color="text-white"
+          bgColor="bg-white/5"
+        />
+      </div>
+
+      <div className="flex gap-4 lg:gap-6 flex-1 overflow-x-auto pb-6 pt-2 custom-scrollbar-h">
+        {COLUMNS.map((col) => (
+          <div key={col.label} className="flex-shrink-0 w-[300px] lg:w-80 flex flex-col h-full">
+            <div className="flex items-center justify-between mb-6 px-2">
             <div className="flex items-center gap-3">
                <div className={`w-2 h-2 rounded-full ${col.color.replace('bg-', 'bg-')}`} />
                <h3 className="text-[10px] lg:text-xs font-black uppercase tracking-widest text-white italic">{col.title}</h3>
@@ -263,8 +296,9 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
           </div>
         </div>
       ))}
+      </div>
 
-      {/* Order Details Modal */}
+    {/* Order Details Modal */}
       <AnimatePresence>
         {viewingOrder && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
@@ -381,6 +415,25 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
           border-radius: 10px;
         }
       `}</style>
+    </div>
+  );
+}
+
+function StatCard({ label, value, icon: Icon, color, bgColor }: any) {
+  return (
+    <div className={`card !p-6 border border-brand-border/50 ${bgColor} relative overflow-hidden group`}>
+      <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+        <Icon size={64} />
+      </div>
+      <div className="flex items-center gap-4 relative z-10">
+        <div className={`w-12 h-12 rounded-2xl ${bgColor.replace('/5', '/10')} flex items-center justify-center ${color} shadow-lg`}>
+          <Icon size={24} />
+        </div>
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">{label}</p>
+          <p className={`text-2xl font-black italic tracking-tighter ${color} leading-none`}>{value}</p>
+        </div>
+      </div>
     </div>
   );
 }

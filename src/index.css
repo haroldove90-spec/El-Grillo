@@ -49,4 +49,17 @@ body {
 .status-active { @apply bg-brand-red shadow-[0_0_8px_#e53e3e]; }
 .status-line { @apply h-[2px] grow bg-brand-border; }
 
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-brand-border/50 rounded-full hover:bg-brand-accent/50 transition-colors;
+}
+
 

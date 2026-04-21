@@ -34,7 +34,8 @@ import { InventoryTable } from './components/InventoryTable';
 import { FinancialSummary } from './components/FinancialSummary';
 import { ProformaInvoice } from './components/ProformaInvoice';
 import { LegalValidation } from './components/LegalValidation';
-import { CertificateView } from './components/CertificateView';
+import { CertificadoView } from './components/CertificadoView';
+import { PersonalView } from './components/PersonalView';
 import { Award } from 'lucide-react';
 
 // --- Components ---
@@ -84,7 +85,7 @@ const SplashScreen = () => (
 );
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'recepcion' | 'inspeccion' | 'inventario' | 'finanzas' | 'presupuesto' | 'autorizacion' | 'certificado'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'recepcion' | 'inspeccion' | 'inventario' | 'finanzas' | 'presupuesto' | 'autorizacion' | 'certificado' | 'personal' | 'perfil'>('dashboard');
   const [isBooting, setIsBooting] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -134,40 +135,40 @@ export default function App() {
             <X size={20} />
           </button>
 
-          <div className="flex flex-col items-center mb-12">
-            <img 
-              src="https://appdesignproyectos.com/elgrillo.png" 
-              alt="Logo El Grillo" 
-              className="w-24 h-24 object-contain mb-4"
-              referrerPolicy="no-referrer"
-            />
-            <div className="text-center">
-              <h1 className="font-black text-lg tracking-tighter text-brand-accent leading-none uppercase">EL GRILLO</h1>
-              <p className="text-[9px] text-white/40 font-black uppercase tracking-widest mt-1">Servicio Automotriz</p>
-            </div>
+        <div className="flex flex-col items-center mb-12 shrink-0">
+          <img 
+            src="https://appdesignproyectos.com/elgrillo.png" 
+            alt="Logo El Grillo" 
+            className="w-24 h-24 object-contain mb-4"
+            referrerPolicy="no-referrer"
+          />
+          <div className="text-center">
+            <h1 className="font-black text-lg tracking-tighter text-brand-accent leading-none uppercase">EL GRILLO</h1>
+            <p className="text-[9px] text-white/40 font-black uppercase tracking-widest mt-1">Servicio Automotriz</p>
           </div>
+        </div>
 
-          <nav className="space-y-4 flex-1">
-            <div className="space-y-1">
-              <SidebarItem label="Dashboard" active={activeTab === 'dashboard'} onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }} icon={LayoutDashboard} />
-              <SidebarItem label="Recepción" active={activeTab === 'recepcion'} onClick={() => { setActiveTab('recepcion'); setIsSidebarOpen(false); }} icon={PlusSquare} />
-              <SidebarItem label="Inspección" active={activeTab === 'inspeccion'} onClick={() => { setActiveTab('inspeccion'); setIsSidebarOpen(false); }} icon={ClipboardList} />
-            </div>
-            
-            <div className="pt-6 border-t border-brand-border/50">
-              <div className="text-[10px] uppercase font-black text-slate-700 mb-4 tracking-widest italic">Administración</div>
-              <SidebarItem label="Finanzas" active={activeTab === 'finanzas'} onClick={() => { setActiveTab('finanzas'); setIsSidebarOpen(false); }} icon={TrendingUp} />
-              <SidebarItem label="Presupuesto" active={activeTab === 'presupuesto'} onClick={() => { setActiveTab('presupuesto'); setIsSidebarOpen(false); }} icon={ClipboardList} />
-              <SidebarItem label="Inventario" active={activeTab === 'inventario'} onClick={() => { setActiveTab('inventario'); setIsSidebarOpen(false); }} icon={Package} />
-            </div>
-            
-            <div className="pt-6 border-t border-brand-border/50">
-              <div className="text-[10px] uppercase font-black text-slate-700 mb-4 tracking-widest italic">Legal & Entrega</div>
-              <SidebarItem label="Validación" active={activeTab === 'autorizacion'} onClick={() => { setActiveTab('autorizacion'); setIsSidebarOpen(false); }} icon={Shield} />
-              <SidebarItem label="Certificado" active={activeTab === 'certificado'} onClick={() => { setActiveTab('certificado'); setIsSidebarOpen(false); }} icon={Award} />
-              <SidebarItem label="Personal" icon={Users} onClick={() => setIsSidebarOpen(false)} />
-            </div>
-          </nav>
+        <nav className="space-y-4 flex-1 overflow-y-auto pr-2 custom-sidebar">
+          <div className="space-y-1">
+            <SidebarItem label="Dashboard" active={activeTab === 'dashboard'} onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }} icon={LayoutDashboard} />
+            <SidebarItem label="Recepción" active={activeTab === 'recepcion'} onClick={() => { setActiveTab('recepcion'); setIsSidebarOpen(false); }} icon={PlusSquare} />
+            <SidebarItem label="Inspección" active={activeTab === 'inspeccion'} onClick={() => { setActiveTab('inspeccion'); setIsSidebarOpen(false); }} icon={ClipboardList} />
+          </div>
+          
+          <div className="pt-6 border-t border-brand-border/50">
+            <div className="text-[10px] uppercase font-black text-slate-700 mb-4 tracking-widest italic">Administración</div>
+            <SidebarItem label="Finanzas" active={activeTab === 'finanzas'} onClick={() => { setActiveTab('finanzas'); setIsSidebarOpen(false); }} icon={TrendingUp} />
+            <SidebarItem label="Presupuesto" active={activeTab === 'presupuesto'} onClick={() => { setActiveTab('presupuesto'); setIsSidebarOpen(false); }} icon={ClipboardList} />
+            <SidebarItem label="Inventario" active={activeTab === 'inventario'} onClick={() => { setActiveTab('inventario'); setIsSidebarOpen(false); }} icon={Package} />
+          </div>
+          
+          <div className="pt-6 border-t border-brand-border/50">
+            <div className="text-[10px] uppercase font-black text-slate-700 mb-4 tracking-widest italic">Legal & Entrega</div>
+            <SidebarItem label="Validación" active={activeTab === 'autorizacion'} onClick={() => { setActiveTab('autorizacion'); setIsSidebarOpen(false); }} icon={Shield} />
+            <SidebarItem label="Certificado" active={activeTab === 'certificado'} onClick={() => { setActiveTab('certificado'); setIsSidebarOpen(false); }} icon={Award} />
+            <SidebarItem label="Personal" active={activeTab === 'personal'} icon={Users} onClick={() => { setActiveTab('personal'); setIsSidebarOpen(false); }} />
+          </div>
+        </nav>
 
           <div className="mt-auto card-branded !bg-slate-800/40 !border-brand-accent/10 !p-4 !rounded-2xl">
             <div className="flex items-center gap-3">
@@ -191,7 +192,8 @@ export default function App() {
                activeTab === 'inventario' ? 'Gestión Inventario' :
                activeTab === 'finanzas' ? 'Cierre Financiero' : 
                activeTab === 'autorizacion' ? 'Protección Legal' : 
-               activeTab === 'certificado' ? 'Certificado Premium' : 'Presupuesto Proforma'}
+               activeTab === 'certificado' ? 'Certificado Premium' : 
+               activeTab === 'personal' ? 'Personal del Taller' : 'Presupuesto Proforma'}
             </h2>
             
             <div className="flex items-center gap-2 lg:gap-6">
@@ -282,7 +284,17 @@ export default function App() {
                   exit={{ opacity: 0, y: -10 }}
                   className="h-full"
                 >
-                  <CertificateView />
+                  <CertificadoView />
+                </motion.div>
+              ) : activeTab === 'personal' ? (
+                <motion.div 
+                  key="personal"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="h-full"
+                >
+                  <PersonalView />
                 </motion.div>
               ) : activeTab === 'presupuesto' ? (
                 <motion.div 
