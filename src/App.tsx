@@ -22,7 +22,9 @@ import {
   PlusSquare,
   ChevronRight,
   Shield,
-  Zap
+  Zap,
+  Menu,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { KanbanBoard } from './components/KanbanBoard';
@@ -32,6 +34,8 @@ import { InventoryTable } from './components/InventoryTable';
 import { FinancialSummary } from './components/FinancialSummary';
 import { ProformaInvoice } from './components/ProformaInvoice';
 import { LegalValidation } from './components/LegalValidation';
+import { CertificateView } from './components/CertificateView';
+import { Award } from 'lucide-react';
 
 // --- Components ---
 
@@ -80,8 +84,10 @@ const SplashScreen = () => (
 );
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'recepcion' | 'inspeccion' | 'inventario' | 'finanzas' | 'presupuesto' | 'autorizacion'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'recepcion' | 'inspeccion' | 'inventario' | 'finanzas' | 'presupuesto' | 'autorizacion' | 'certificado'>('dashboard');
   const [isBooting, setIsBooting] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => setIsBooting(false), 2500);
@@ -95,8 +101,39 @@ export default function App() {
       </AnimatePresence>
 
       <div className="flex h-screen bg-brand-black overflow-hidden font-sans">
+        {/* Mobile Toggle */}
+        <button 
+          onClick={() => setIsSidebarOpen(true)}
+          className="lg:hidden fixed bottom-6 right-6 z-50 w-14 h-14 bg-brand-accent text-brand-sidebar rounded-full flex items-center justify-center shadow-2xl shadow-brand-accent/20"
+        >
+          <Menu size={24} strokeWidth={3} />
+        </button>
+
+        {/* Sidebar Overlay (Mobile) */}
+        <AnimatePresence>
+          {isSidebarOpen && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSidebarOpen(false)}
+              className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+            />
+          )}
+        </AnimatePresence>
+
         {/* Sidebar */}
-        <aside className="w-[240px] border-r border-brand-border flex flex-col p-8 bg-brand-sidebar z-20 shadow-2xl">
+        <aside className={`
+          fixed lg:relative inset-y-0 left-0 w-[280px] lg:w-[240px] border-r border-brand-border flex flex-col p-8 bg-brand-sidebar z-[70] shadow-2xl transition-transform duration-300 transform
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}>
+          <button 
+            onClick={() => setIsSidebarOpen(false)}
+            className="lg:hidden absolute top-6 right-6 p-2 text-slate-muted"
+          >
+            <X size={20} />
+          </button>
+
           <div className="flex flex-col items-center mb-12">
             <img 
               src="https://appdesignproyectos.com/elgrillo.png" 
@@ -125,8 +162,9 @@ export default function App() {
             </div>
             
             <div className="pt-6 border-t border-brand-border/50">
-              <div className="text-[10px] uppercase font-black text-slate-700 mb-4 tracking-widest italic">Legal</div>
+              <div className="text-[10px] uppercase font-black text-slate-700 mb-4 tracking-widest italic">Legal & Entrega</div>
               <SidebarItem label="Validación" active={activeTab === 'autorizacion'} onClick={() => setActiveTab('autorizacion')} icon={Shield} />
+              <SidebarItem label="Certificado" active={activeTab === 'certificado'} onClick={() => setActiveTab('certificado')} icon={Award} />
               <SidebarItem label="Personal" icon={Users} />
             </div>
           </nav>
@@ -143,25 +181,28 @@ export default function App() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-hidden flex flex-col relative bg-brand-black">
-          {/* Header Overlay (for Desktop Desktop) */}
-          <header className=" h-20 flex items-center justify-between px-10 z-10">
-            <h2 className="text-2xl font-black italic text-white tracking-tighter uppercase">
+        <main className="flex-1 overflow-hidden flex flex-col relative bg-brand-black w-full">
+          {/* Header Overlay */}
+          <header className="h-20 lg:h-24 flex items-center justify-between px-6 lg:px-10 z-10 shrink-0">
+            <h2 className="text-xl lg:text-2xl font-black italic text-white tracking-tighter uppercase truncate mr-4">
               {activeTab === 'dashboard' ? 'Panel de Control' : 
                activeTab === 'recepcion' ? 'Nueva Recepción' : 
                activeTab === 'inspeccion' ? 'Inspección Semáforo' : 
                activeTab === 'inventario' ? 'Gestión Inventario' :
                activeTab === 'finanzas' ? 'Cierre Financiero' : 
-               activeTab === 'autorizacion' ? 'Protección Legal' : 'Presupuesto Proforma'}
+               activeTab === 'autorizacion' ? 'Protección Legal' : 
+               activeTab === 'certificado' ? 'Certificado Premium' : 'Presupuesto Proforma'}
             </h2>
             
-            <div className="flex items-center gap-6">
-              <div className="relative">
+            <div className="flex items-center gap-2 lg:gap-6">
+              <div className="relative hidden md:block">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
                 <input 
                   type="text" 
                   placeholder="Búsqueda rápida..." 
-                  className="bg-brand-sidebar border border-brand-border rounded-full py-2 pl-10 pr-4 text-[11px] focus:border-brand-accent outline-none transition-all w-64"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-brand-sidebar border border-brand-border rounded-full py-2 pl-10 pr-4 text-[11px] focus:border-brand-accent outline-none transition-all w-48 lg:w-64"
                 />
               </div>
               <button className="p-2 rounded-xl bg-brand-sidebar border border-brand-border relative">
@@ -171,7 +212,7 @@ export default function App() {
             </div>
           </header>
 
-          <div className="flex-1 overflow-auto px-10 pb-10 custom-scrollbar">
+          <div className="flex-1 overflow-auto px-4 lg:px-10 pb-10 custom-scrollbar">
             <AnimatePresence mode="wait">
               {activeTab === 'dashboard' ? (
                 <motion.div 
@@ -181,7 +222,7 @@ export default function App() {
                   exit={{ opacity: 0, y: -10 }}
                   className="h-full"
                 >
-                  <KanbanBoard />
+                  <KanbanBoard searchQuery={searchQuery} />
                 </motion.div>
               ) : activeTab === 'recepcion' ? (
                 <motion.div 
@@ -233,7 +274,17 @@ export default function App() {
                 >
                   <LegalValidation />
                 </motion.div>
-              ) : (
+              ) : activeTab === 'certificado' ? (
+                <motion.div 
+                  key="certificado"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="h-full"
+                >
+                  <CertificateView />
+                </motion.div>
+              ) : activeTab === 'presupuesto' ? (
                 <motion.div 
                   key="presupuesto"
                   initial={{ opacity: 0, y: 10 }}
@@ -243,6 +294,8 @@ export default function App() {
                 >
                   <ProformaInvoice />
                 </motion.div>
+              ) : (
+                <div />
               )}
             </AnimatePresence>
           </div>
