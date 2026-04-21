@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Search, UserPlus, Car, CheckSquare, FileText, ChevronRight, Phone, CheckCircle2, Loader2, AlertCircle, Zap } from 'lucide-react';
+import { Search, UserPlus, Car, CheckSquare, FileText, ChevronRight, Phone, CheckCircle2, Loader2, AlertCircle, Zap, Download, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { db } from '../services/db';
+import { PdfService } from '../services/pdfService';
 
 const SERVICES = [
   'Mecánica General', 'A/C y Calefacción', 'Sistema Eléctrico', 
@@ -114,12 +115,6 @@ export function ReceptionForm() {
       });
 
       setSuccess(true);
-      setTimeout(() => {
-        setSuccess(false);
-        setStep(1);
-        resetForm();
-      }, 3000);
-
     } catch (err: any) {
       setError(err.message || 'Error al guardar la orden.');
     } finally {
@@ -128,6 +123,8 @@ export function ReceptionForm() {
   };
 
   const resetForm = () => {
+    setStep(1);
+    setSuccess(false);
     setPhone('');
     setClientData(null);
     setVehicleData({ make: '', model: '', year: '', plate: '', vin: '' });
@@ -137,15 +134,44 @@ export function ReceptionForm() {
 
   if (success) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-center p-8">
-        <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-          <CheckCircle2 size={80} className="text-brand-green mb-6 mx-auto" />
-          <h2 className="text-2xl font-black text-white italic uppercase tracking-tighter mb-2">ORDEN REGISTRADA</h2>
-          <p className="text-slate-muted italic text-sm">La orden de {vehicleData.plate} ya está en el tablero.</p>
+      <div className="flex flex-col items-center justify-center py-12 text-center max-w-lg mx-auto">
+        <motion.div 
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="w-24 h-24 bg-brand-green/10 rounded-[2.5rem] flex items-center justify-center text-brand-green mb-8"
+        >
+          <CheckCircle2 size={56} strokeWidth={3} />
         </motion.div>
+        <h2 className="text-3xl font-black italic text-white uppercase tracking-tighter mb-4">Vehículo Registrado</h2>
+        <p className="text-slate-400 font-medium italic mb-10 leading-relaxed">
+          La unidad ha sido ingresada al sistema correctamente. Ya puedes imprimir la hoja de recepción para el cliente.
+        </p>
+        
+        <div className="grid grid-cols-1 gap-4 w-full">
+          <button 
+            onClick={() => PdfService.generateReceptionSheet({
+               phone,
+               client: clientData?.first_name ? `${clientData.first_name} ${clientData.last_name}` : null,
+               vehicleData,
+               selectedServices,
+               notes
+            })}
+            className="w-full bg-brand-accent text-brand-sidebar py-5 rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-brand-accent/20 hover:scale-105 active:scale-95 transition-all"
+          >
+            <Download size={20} /> Descargar Hoja de Recepción
+          </button>
+          
+          <button 
+            onClick={resetForm}
+            className="w-full bg-brand-sidebar border border-brand-border text-white py-5 rounded-3xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-slate-800 transition-all font-black"
+          >
+            <RefreshCw size={20} /> Nuevo Registro
+          </button>
+        </div>
       </div>
     );
   }
+
 
   return (
     <div className="max-w-md mx-auto h-full flex flex-col pb-20">

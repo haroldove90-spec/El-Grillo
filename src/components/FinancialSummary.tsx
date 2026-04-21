@@ -1,7 +1,8 @@
 import React from 'react';
-import { TrendingUp, Wallet, ShoppingBag, PieChart, ArrowUpRight } from 'lucide-react';
+import { TrendingUp, Wallet, ShoppingBag, PieChart, ArrowUpRight, Download } from 'lucide-react';
 import { formatCurrency } from '../utils/financialLogic';
 import { motion } from 'motion/react';
+import { PdfService } from '../services/pdfService';
 
 const MOCK_DAILY_STATS = {
   revenue: 12450.50,
@@ -12,11 +13,23 @@ const MOCK_DAILY_STATS = {
 };
 
 export function FinancialSummary() {
+  const handleDownload = () => {
+    PdfService.generateFinancialReport(MOCK_DAILY_STATS);
+  };
+
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-black italic text-white tracking-tighter uppercase">Cierre de Caja Diario</h2>
-        <p className="text-[10px] text-brand-accent font-black uppercase tracking-widest mt-1">Análisis de rentabilidad hoy</p>
+      <div className="flex justify-between items-end">
+        <div>
+          <h2 className="text-2xl font-black italic text-white tracking-tighter uppercase">Cierre de Caja Diario</h2>
+          <p className="text-[10px] text-brand-accent font-black uppercase tracking-widest mt-1">Análisis de rentabilidad hoy</p>
+        </div>
+        <button 
+          onClick={handleDownload}
+          className="bg-brand-accent text-brand-sidebar px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-accent/20"
+        >
+          <Download size={16} /> Descargar Cierre
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

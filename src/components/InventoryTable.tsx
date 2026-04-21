@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../services/db';
-import { Package, Pencil, Trash2, Plus, AlertCircle, TrendingDown, Loader2, X, Check, Search } from 'lucide-react';
+import { Package, Pencil, Trash2, Plus, AlertCircle, TrendingDown, Loader2, X, Check, Search, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { PdfService } from '../services/pdfService';
 
 interface InventoryItem {
   id: string;
@@ -100,6 +101,13 @@ export function InventoryTable() {
                className="w-full bg-brand-sidebar border border-brand-border rounded-xl py-3 pl-10 pr-4 text-xs focus:border-brand-accent outline-none text-white"
              />
           </div>
+          <button 
+            onClick={() => PdfService.generateInventoryReport(filteredItems)}
+            className="p-3 bg-brand-sidebar border border-brand-border rounded-xl text-slate-400 hover:text-white transition-all"
+            title="Descargar Reporte"
+          >
+            <Download size={18} />
+          </button>
           <button 
             onClick={() => { setEditingItem({}); setIsModalOpen(true); }}
             className="bg-brand-accent text-brand-sidebar px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-brand-accent/20 flex items-center gap-2 hover:scale-105 active:scale-95 transition-all whitespace-nowrap"

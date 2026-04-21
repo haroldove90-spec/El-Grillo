@@ -1,6 +1,7 @@
-import React from 'react';
-import { Users, UserPlus, Mail, Phone, BadgeCheck, Wrench, Star, Pencil, Trash2, Calendar } from 'lucide-react';
-import { motion } from 'motion/react';
+import React, { useState } from 'react';
+import { Users, UserPlus, Mail, Phone, BadgeCheck, Wrench, Star, Pencil, Trash2, Calendar, X, Save } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { PdfService } from '../services/pdfService';
 
 interface Staff {
   id: string;
@@ -13,13 +14,13 @@ interface Staff {
   specialty: string;
 }
 
-const SAMPLE_STAFF: Staff[] = [
+const INITIAL_STAFF: Staff[] = [
   {
     id: '1',
     name: 'Juan "El Profe" Reyes',
     role: 'Mecánico A',
     email: 'juan.reyes@elgrillo.com',
-    phone: '551-234-5678',
+    phone: '5512345678',
     efficiency: 95,
     startDate: '2020-01-15',
     specialty: 'Transmisiones & Motores'
@@ -29,7 +30,7 @@ const SAMPLE_STAFF: Staff[] = [
     name: 'Marco Antonio Sosa',
     role: 'Mecánico B',
     email: 'marco.sosa@elgrillo.com',
-    phone: '552-345-6789',
+    phone: '5523456789',
     efficiency: 88,
     startDate: '2022-06-10',
     specialty: 'Suspensión & Frenos'
@@ -39,7 +40,7 @@ const SAMPLE_STAFF: Staff[] = [
     name: 'Karla Valencia',
     role: 'Asesor',
     email: 'karla.v@elgrillo.com',
-    phone: '553-456-7890',
+    phone: '5534567890',
     efficiency: 92,
     startDate: '2021-03-22',
     specialty: 'Atención & Refacciones'
@@ -49,7 +50,7 @@ const SAMPLE_STAFF: Staff[] = [
     name: 'Luis "Chispa" Luna',
     role: 'Eléctrico',
     email: 'luis.luna@elgrillo.com',
-    phone: '554-567-8901',
+    phone: '5545678901',
     efficiency: 97,
     startDate: '2019-11-05',
     specialty: 'Diagnóstico Computarizado'
@@ -57,6 +58,43 @@ const SAMPLE_STAFF: Staff[] = [
 ];
 
 export function PersonalView() {
+  const [staff, setStaff] = useState<Staff[]>(INITIAL_STAFF);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingStaff, setEditingStaff] = useState<Staff | null>(null);
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('¿Estás seguro de eliminar a este miembro del equipo?')) {
+      setStaff(prev => prev.filter(s => s.id !== id));
+    }
+  };
+
+  const handleSave = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const data: any = {
+      id: editingStaff?.id || Math.random().toString(36).substr(2, 9),
+      name: formData.get('name'),
+      role: formData.get('role'),
+      email: formData.get('email'),
+      phone: formData.get('phone'),
+      efficiency: Number(formData.get('efficiency')) || 0,
+      startDate: formData.get('startDate'),
+      specialty: formData.get('specialty'),
+    };
+
+    if (editingStaff) {
+      setStaff(prev => prev.map(s => s.id === editingStaff.id ? data : s));
+    } else {
+      setStaff(prev => [...prev, data]);
+    }
+    setIsModalOpen(false);
+    setEditingStaff(null);
+  };
+
+  const handleDownloadReport = () => {
+    PdfService.generateStaffReport(staff);
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex justify-between items-center mb-8">
@@ -64,13 +102,24 @@ export function PersonalView() {
             <p className="text-[10px] text-brand-accent font-black uppercase tracking-widest italic mb-1">Nómina & Equipo</p>
             <p className="text-sm text-slate-500 font-bold uppercase italic">Gestiona el talento humano de El Grillo</p>
         </div>
-        <button className="bg-brand-accent text-brand-sidebar px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-accent/20">
-          <UserPlus size={16} /> Agregar Personal
-        </button>
+        <div className="flex gap-4">
+            <button 
+                onClick={handleDownloadReport}
+                className="bg-brand-sidebar border border-brand-border text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-brand-card transition-all"
+            >
+                Descargar Reporte
+            </button>
+            <button 
+                onClick={() => { setEditingStaff(null); setIsModalOpen(true); }}
+                className="bg-brand-accent text-brand-sidebar px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-accent/20"
+            >
+                <UserPlus size={16} /> Agregar Personal
+            </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        {SAMPLE_STAFF.map((member) => (
+        {staff.map((member) => (
           <motion.div 
             key={member.id}
             whileHover={{ y: -5 }}
@@ -122,10 +171,16 @@ export function PersonalView() {
                     </a>
                 </div>
                 <div className="flex gap-2">
-                    <button className="p-2 text-slate-500 hover:text-white transition-colors">
+                    <button 
+                        onClick={() => { setEditingStaff(member); setIsModalOpen(true); }}
+                        className="p-2 text-slate-500 hover:text-white transition-colors"
+                    >
                         <Pencil size={14} />
                     </button>
-                    <button className="p-2 text-slate-500 hover:text-brand-red transition-colors">
+                    <button 
+                        onClick={() => handleDelete(member.id)}
+                        className="p-2 text-slate-500 hover:text-brand-red transition-colors"
+                    >
                         <Trash2 size={14} />
                     </button>
                 </div>
@@ -133,6 +188,81 @@ export function PersonalView() {
           </motion.div>
         ))}
       </div>
+
+      {/* Staff Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setIsModalOpen(false); setEditingStaff(null); }} className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }} 
+              animate={{ scale: 1, opacity: 1, y: 0 }} 
+              exit={{ scale: 0.9, opacity: 0, y: 20 }} 
+              className="relative bg-brand-sidebar border border-brand-border w-full max-w-xl rounded-[2.5rem] p-10 shadow-2xl"
+            >
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter leading-none">
+                    {editingStaff ? 'Editar Personal' : 'Nuevo Personal'}
+                  </h3>
+                  <p className="text-[10px] text-brand-accent font-black uppercase tracking-widest mt-2 italic">Registro de Talento El Grillo</p>
+                </div>
+                <button onClick={() => { setIsModalOpen(false); setEditingStaff(null); }} className="p-2 rounded-xl bg-white/5 text-slate-muted hover:text-white transition-colors">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSave} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Nombre Completo</label>
+                    <input name="name" defaultValue={editingStaff?.name} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Rol / Cargo</label>
+                    <select name="role" defaultValue={editingStaff?.role} className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none">
+                      <option value="Mecánico A">Mecánico A</option>
+                      <option value="Mecánico B">Mecánico B</option>
+                      <option value="Asesor">Asesor</option>
+                      <option value="Gerente">Gerente</option>
+                      <option value="Eléctrico">Eléctrico</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Email</label>
+                    <input name="email" type="email" defaultValue={editingStaff?.email} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Teléfono</label>
+                    <input name="phone" placeholder="Ej. 5512345678" defaultValue={editingStaff?.phone} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Especialidad</label>
+                    <input name="specialty" defaultValue={editingStaff?.specialty} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Fecha de Alta</label>
+                    <input name="startDate" type="date" defaultValue={editingStaff?.startDate || new Date().toISOString().split('T')[0]} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Eficiencia (%)</label>
+                    <input name="efficiency" type="number" min="0" max="100" defaultValue={editingStaff?.efficiency || 100} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <button type="button" onClick={() => { setIsModalOpen(false); setEditingStaff(null); }} className="flex-1 bg-white/5 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">
+                    Cancelar
+                  </button>
+                  <button type="submit" className="flex-1 bg-brand-accent text-brand-sidebar py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-brand-accent/10">
+                    <Save size={16} /> Guardar Registro
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <div className="card !p-8 bg-brand-sidebar border border-brand-border flex items-center justify-between rounded-[2.5rem]">
          <div className="flex items-center gap-6">

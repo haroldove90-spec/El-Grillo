@@ -2,6 +2,7 @@ import React from 'react';
 import { FileText, Wrench, Printer, Download, CreditCard, ShieldCheck } from 'lucide-react';
 import { formatCurrency, calculateOrderFinancials, FinancialDetail } from '../utils/financialLogic';
 import { motion } from 'motion/react';
+import { PdfService } from '../services/pdfService';
 
 interface InvoiceProps {
   orderNumber: string;
@@ -26,7 +27,12 @@ const MOCK_INVOICE: InvoiceProps = {
 };
 
 export function ProformaInvoice() {
-  const { subtotal, iva, total, grossProfit, margin } = calculateOrderFinancials(MOCK_INVOICE.items, MOCK_INVOICE.applyIva);
+  const socials = calculateOrderFinancials(MOCK_INVOICE.items, MOCK_INVOICE.applyIva);
+  const { subtotal, iva, total, grossProfit, margin } = socials;
+
+  const handleDownload = () => {
+    PdfService.generateInvoice(MOCK_INVOICE, socials);
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -39,7 +45,10 @@ export function ProformaInvoice() {
             <button className="p-3 bg-slate-800 rounded-xl text-slate-400 hover:text-white transition-colors border border-brand-border">
                <Printer size={20} />
             </button>
-            <button className="p-3 bg-brand-accent rounded-xl text-brand-sidebar shadow-lg shadow-brand-accent/10 active:scale-95 transition-all">
+            <button 
+                onClick={handleDownload}
+                className="p-3 bg-brand-accent rounded-xl text-brand-sidebar shadow-lg shadow-brand-accent/10 active:scale-95 transition-all"
+            >
                <Download size={20} strokeWidth={3} />
             </button>
          </div>

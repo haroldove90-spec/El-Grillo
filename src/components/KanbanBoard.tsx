@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { CreditCard, Banknote, MapPin, MessageSquare, ExternalLink, Share2, MoreVertical, Trash2, Loader2, Gauge, ShieldCheck, CheckCircle2, Clock, Search, Wrench, FileText } from 'lucide-react';
+import { Download, CreditCard, Banknote, MapPin, MessageSquare, ExternalLink, Share2, MoreVertical, Trash2, Loader2, Gauge, ShieldCheck, CheckCircle2, Clock, Search, Wrench, FileText, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatMexicanPhone, generateWhatsAppMessage } from '../utils/mechanicsLogic';
 import { db } from '../services/db';
+import { PdfService } from '../services/pdfService';
 import { SignaturePad } from './SignaturePad';
 
 type ServiceStatus = 'Recepcion' | 'Diagnostico' | 'En Reparacion' | 'Listo' | 'Entregado';
@@ -40,18 +41,30 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
       setLoading(true);
       const data = await db.orders.list();
       
-      const mappedOrders: Order[] = data.map((o: any) => ({
+      let mappedOrders: Order[] = data.map((o: any) => ({
         id: o.id,
         orderNumber: o.order_number.toString(),
-        client: `${o.vehicles?.clients?.first_name} ${o.vehicles?.clients?.last_name}`,
+        client: o.vehicles?.clients ? `${o.vehicles.clients.first_name} ${o.vehicles.clients.last_name}` : 'Cliente Desconocido',
         phone: o.vehicles?.clients?.phone || '',
-        vehicle: `${o.vehicles?.make} ${o.vehicles?.model}`,
+        vehicle: o.vehicles ? `${o.vehicles.make} ${o.vehicles.model}` : 'Vehículo',
         plate: o.vehicles?.license_plate || 'S/P',
         paymentType: o.apply_iva ? 'Card' : 'Cash',
         status: o.status as ServiceStatus,
         total: o.total_amount || 0,
         services: o.notes ? [o.notes] : ['Servicio General']
       }));
+
+      // Inyectar datos de muestra si no hay registros reales
+      if (mappedOrders.length === 0) {
+        mappedOrders = [
+          { id: 's1', orderNumber: '2040', client: 'Carlos Sánchez', phone: '5566778899', vehicle: 'Mazda 3', plate: 'ABC-1234', paymentType: 'Cash', status: 'En Reparacion', total: 4500, services: ['Cambio de frenos y discos'] },
+          { id: 's2', orderNumber: '2041', client: 'Maria Garcia', phone: '5511223344', vehicle: 'Honda CR-V', plate: 'MEX-9090', paymentType: 'Card', status: 'Diagnostico', total: 1200, services: ['Revisión sistema eléctrico'] },
+          { id: 's3', orderNumber: '2042', client: 'Roberto Gomez', phone: '5599887766', vehicle: 'Toyota Hilux', plate: 'PUE-1122', paymentType: 'Cash', status: 'Listo', total: 8900, services: ['Ajuste de embrague'] },
+          { id: 's4', orderNumber: '2043', client: 'Ana Lopez', phone: '5544332211', vehicle: 'VW Golf GTI', plate: 'GRL-1020', paymentType: 'Card', status: 'Recepcion', total: 2500, services: ['Ruidos en suspensión delantera'] },
+          { id: 's5', orderNumber: '2044', client: 'Luis Torres', phone: '5555443322', vehicle: 'Nissan Versa', plate: 'CDMX-889', paymentType: 'Cash', status: 'En Reparacion', total: 3400, services: ['Sobrecalentamiento motor'] },
+          { id: 's6', orderNumber: '2045', client: 'Fernanda Ruiz', phone: '5588776655', vehicle: 'Audi A4', plate: 'VIP-777', paymentType: 'Card', status: 'Diagnostico', total: 15600, services: ['Fuga de aceite en transmisión'] },
+        ];
+      }
       
       setOrders(mappedOrders);
     } catch (err) {
@@ -162,8 +175,8 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
           label="Ingresos Estimados" 
           value={`$${orders.reduce((acc, o) => acc + o.total, 0).toLocaleString()}`} 
           icon={CreditCard} 
-          color="text-white"
-          bgColor="bg-white/5"
+          color="text-brand-green"
+          bgColor="bg-brand-green/5"
         />
       </div>
 
@@ -314,7 +327,25 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
                          <p className="text-[10px] text-brand-accent font-black uppercase tracking-widest mt-2">{viewingOrder.status} - El Grillo Automotriz</p>
                       </div>
                    </div>
-                   <button onClick={() => setViewingOrder(null)} className="p-2 rounded-xl bg-white/5 text-slate-muted hover:text-white"><Trash2 size={24} className="rotate-45" /></button>
+                   <div className="flex gap-2">
+                       <button 
+                          onClick={() => PdfService.generateOrderPDF({
+                             order_number: viewingOrder.orderNumber,
+                             client_name: viewingOrder.client,
+                             client_phone: viewingOrder.phone,
+                             vehicle_model: viewingOrder.vehicle,
+                             vehicle_plate: viewingOrder.plate,
+                             status: viewingOrder.status,
+                             service_description: viewingOrder.services.join('\n')
+                          })}
+                          className="px-4 bg-brand-sidebar border border-brand-border text-white text-[9px] font-black uppercase tracking-widest rounded-xl hover:bg-brand-card transition-all flex items-center gap-2"
+                       >
+                          <Download size={12} /> PDF
+                       </button>
+                       <button onClick={() => setViewingOrder(null)} className="p-2 rounded-xl bg-white/5 text-slate-muted hover:text-white">
+                          <X size={24} />
+                       </button>
+                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-8 mb-8">

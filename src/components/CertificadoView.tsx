@@ -1,6 +1,7 @@
-import React from 'react';
-import { Award, CheckCircle2, ShieldCheck, Download, ExternalLink, Calendar, Car, User } from 'lucide-react';
-import { motion } from 'motion/react';
+import React, { useState } from 'react';
+import { Award, CheckCircle2, ShieldCheck, Download, ExternalLink, Calendar, Car, User, X, Save, Trash2 as TrashIcon } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { PdfService } from '../services/pdfService';
 
 interface Certificate {
   id: string;
@@ -13,7 +14,7 @@ interface Certificate {
   score: number;
 }
 
-const SAMPLE_CERTIFICATES: Certificate[] = [
+const INITIAL_CERTIFICATES: Certificate[] = [
   {
     id: '1',
     orderNumber: '1004',
@@ -47,10 +48,47 @@ const SAMPLE_CERTIFICATES: Certificate[] = [
 ];
 
 export function CertificadoView() {
+  const [certificates, setCertificates] = useState<Certificate[]>(INITIAL_CERTIFICATES);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingCert, setEditingCert] = useState<Certificate | null>(null);
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('¿Estás seguro de eliminar este certificado?')) {
+      setCertificates(prev => prev.filter(c => c.id !== id));
+    }
+  };
+
+  const handleSave = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const data: any = {
+      id: editingCert?.id || Math.random().toString(36).substr(2, 9),
+      orderNumber: formData.get('orderNumber'),
+      client: formData.get('client'),
+      vehicle: formData.get('vehicle'),
+      plate: formData.get('plate'),
+      date: formData.get('date'),
+      expiryDate: formData.get('expiryDate'),
+      score: Number(formData.get('score')) || 100,
+    };
+
+    if (editingCert) {
+      setCertificates(prev => prev.map(c => c.id === editingCert.id ? data : c));
+    } else {
+      setCertificates(prev => [...prev, data]);
+    }
+    setIsModalOpen(false);
+    setEditingCert(null);
+  };
+
+  const handleDownload = (cert: Certificate) => {
+    PdfService.generateCertificate(cert);
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {SAMPLE_CERTIFICATES.map((cert) => (
+        {certificates.map((cert) => (
           <motion.div 
             key={cert.id}
             whileHover={{ y: -5 }}
@@ -65,9 +103,19 @@ export function CertificadoView() {
                 <div className="bg-brand-accent/20 border border-brand-accent/20 p-2 rounded-xl">
                   <Award className="text-brand-accent" size={24} />
                 </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-black text-brand-accent uppercase tracking-widest italic">Certificado Premium</p>
-                  <p className="text-xl font-black text-white italic">#{cert.orderNumber}</p>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => { setEditingCert(cert); setIsModalOpen(true); }}
+                    className="p-2 rounded-lg bg-white/5 text-slate-400 hover:text-white transition-colors"
+                  >
+                    <PencilIcon size={14} />
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(cert.id)}
+                    className="p-2 rounded-lg bg-white/5 text-slate-400 hover:text-brand-red transition-colors"
+                  >
+                    <TrashIcon size={14} />
+                  </button>
                 </div>
               </div>
               <div className="relative z-10">
@@ -128,11 +176,11 @@ export function CertificadoView() {
               </div>
 
               <div className="flex gap-3 pt-2">
-                <button className="flex-1 bg-brand-accent text-brand-sidebar py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-accent/10">
+                <button 
+                  onClick={() => handleDownload(cert)}
+                  className="flex-1 bg-brand-accent text-brand-sidebar py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-brand-accent/10"
+                >
                   <Download size={14} /> Descargar PDF
-                </button>
-                <button className="p-3 bg-slate-800 text-white rounded-2xl hover:bg-slate-700 transition-colors">
-                  <ExternalLink size={16} />
                 </button>
               </div>
             </div>
@@ -145,7 +193,10 @@ export function CertificadoView() {
         ))}
 
         {/* Create New Certificate Button */}
-        <div className="border-2 border-dashed border-brand-border rounded-[2.5rem] flex flex-col items-center justify-center p-8 gap-4 opacity-40 hover:opacity-100 hover:border-brand-accent transition-all cursor-pointer bg-brand-sidebar/20 group">
+        <div 
+          onClick={() => { setEditingCert(null); setIsModalOpen(true); }}
+          className="border-2 border-dashed border-brand-border rounded-[2.5rem] flex flex-col items-center justify-center p-8 gap-4 opacity-40 hover:opacity-100 hover:border-brand-accent transition-all cursor-pointer bg-brand-sidebar/20 group"
+        >
           <div className="w-16 h-16 rounded-[1.5rem] bg-brand-sidebar border border-brand-border flex items-center justify-center text-slate-500 group-hover:text-brand-accent group-hover:border-brand-accent transition-all">
             <Award size={32} />
           </div>
@@ -155,6 +206,75 @@ export function CertificadoView() {
           </div>
         </div>
       </div>
+
+      {/* Certificate Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setIsModalOpen(false); setEditingCert(null); }} className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }} 
+              animate={{ scale: 1, opacity: 1, y: 0 }} 
+              exit={{ scale: 0.9, opacity: 0, y: 20 }} 
+              className="relative bg-brand-sidebar border border-brand-border w-full max-w-xl rounded-[2.5rem] p-10 shadow-2xl"
+            >
+              <div className="flex justify-between items-start mb-8">
+                <div>
+                  <h3 className="text-2xl font-black text-white italic uppercase tracking-tighter leading-none">
+                    {editingCert ? 'Editar Certificado' : 'Nuevo Certificado'}
+                  </h3>
+                  <p className="text-[10px] text-brand-accent font-black uppercase tracking-widest mt-2 italic">Emisión de Garantía El Grillo</p>
+                </div>
+                <button onClick={() => { setIsModalOpen(false); setEditingCert(null); }} className="p-2 rounded-xl bg-white/5 text-slate-muted hover:text-white transition-colors">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <form onSubmit={handleSave} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Orden #</label>
+                    <input name="orderNumber" defaultValue={editingCert?.orderNumber} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Cliente</label>
+                    <input name="client" defaultValue={editingCert?.client} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Vehículo</label>
+                    <input name="vehicle" defaultValue={editingCert?.vehicle} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Placas</label>
+                    <input name="plate" defaultValue={editingCert?.plate} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Fecha Emisión</label>
+                    <input name="date" type="date" defaultValue={editingCert?.date || new Date().toISOString().split('T')[0]} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Fecha Vencimiento</label>
+                    <input name="expiryDate" type="date" defaultValue={editingCert?.expiryDate} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Puntaje Salud (0-100)</label>
+                    <input name="score" type="number" min="0" max="100" defaultValue={editingCert?.score || 100} required className="w-full bg-brand-black/40 border border-brand-border rounded-xl p-3 text-sm focus:border-brand-accent outline-none" />
+                  </div>
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <button type="button" onClick={() => { setIsModalOpen(false); setEditingCert(null); }} className="flex-1 bg-white/5 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">
+                    Cancelar
+                  </button>
+                  <button type="submit" className="flex-1 bg-brand-accent text-brand-sidebar py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-brand-accent/10">
+                    <Save size={16} /> Guardar Certificado
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <div className="card border border-brand-border/50 bg-brand-accent/5 p-8 rounded-[3rem]">
         <div className="flex items-center gap-6">
@@ -172,3 +292,9 @@ export function CertificadoView() {
     </div>
   );
 }
+
+function PencilIcon({ size }: { size: number }) {
+  return <Pencil size={size} />;
+}
+
+import { Pencil } from 'lucide-react';

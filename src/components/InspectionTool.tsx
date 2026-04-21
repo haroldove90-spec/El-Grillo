@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { calculateSemaforoStatus } from '../utils/mechanicsLogic';
-import { Wrench, AlertTriangle, CheckCircle2, Clock, Car, ClipboardCheck } from 'lucide-react';
+import { Wrench, AlertTriangle, CheckCircle2, Clock, Car, ClipboardCheck, Download } from 'lucide-react';
 import { motion } from 'motion/react';
+import { PdfService } from '../services/pdfService';
 
 export function InspectionTool() {
   const [inspections, setInspections] = useState([
@@ -13,6 +14,10 @@ export function InspectionTool() {
 
   const updateWear = (id: number, val: number) => {
     setInspections(prev => prev.map(i => i.id === id ? { ...i, wear: val } : i));
+  };
+
+  const handleDownload = () => {
+    PdfService.generateInspectionReport('VW GOLF GTI - GRL-1020', '2045', inspections);
   };
 
   return (
@@ -88,8 +93,11 @@ export function InspectionTool() {
       </div>
 
       <div className="flex justify-end gap-4">
-        <button className="px-8 py-4 bg-slate-800 text-white font-black rounded-2xl text-xs uppercase tracking-widest border border-brand-border active:scale-95 transition-all">
-          GUARDAR BORRADOR
+        <button 
+          onClick={handleDownload}
+          className="px-8 py-4 bg-slate-800 text-white font-black rounded-2xl text-xs uppercase tracking-widest border border-brand-border flex items-center gap-2 hover:bg-slate-700 transition-all"
+        >
+          <Download size={18} /> DESCARGAR REPORTE
         </button>
         <button className="px-8 py-4 bg-brand-yellow text-brand-sidebar font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-brand-yellow/20 active:scale-95 transition-all flex items-center gap-2">
           <ClipboardCheck size={18} />
