@@ -41,15 +41,15 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
       setLoading(true);
       const data = await db.orders.list();
       
-      let mappedOrders: Order[] = data.map((o: any) => ({
-        id: o.id,
-        orderNumber: o.order_number.toString(),
+      let mappedOrders: Order[] = (data || []).map((o: any) => ({
+        id: o.id || Math.random().toString(),
+        orderNumber: (o.order_number || '').toString(),
         client: o.vehicles?.clients ? `${o.vehicles.clients.first_name} ${o.vehicles.clients.last_name}` : 'Cliente Desconocido',
         phone: o.vehicles?.clients?.phone || '',
         vehicle: o.vehicles ? `${o.vehicles.make} ${o.vehicles.model}` : 'Vehículo',
         plate: o.vehicles?.license_plate || 'S/P',
         paymentType: o.apply_iva ? 'Card' : 'Cash',
-        status: o.status as ServiceStatus,
+        status: (o.status || 'Recepcion') as ServiceStatus,
         total: o.total_amount || 0,
         services: o.notes ? [o.notes] : ['Servicio General']
       }));
@@ -69,6 +69,10 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
       setOrders(mappedOrders);
     } catch (err) {
       console.error('Error fetching orders:', err);
+      // Fallback a datos de muestra en caso de error de conexión para asegurar que se vea algo
+      setOrders([
+        { id: 'e1', orderNumber: 'ERR', client: 'Modo Demo (Error DB)', phone: '-', vehicle: 'Demo', plate: 'DEMO', paymentType: 'Cash', status: 'Recepcion', total: 0, services: ['Error de conexión'] }
+      ]);
     } finally {
       setLoading(false);
     }
@@ -184,14 +188,14 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
         {COLUMNS.map((col) => (
           <div key={col.label} className="flex-shrink-0 w-[300px] lg:w-80 flex flex-col h-full">
             <div className="flex items-center justify-between mb-6 px-2">
-            <div className="flex items-center gap-3">
-               <div className={`w-2 h-2 rounded-full ${col.color.replace('bg-', 'bg-')}`} />
-               <h3 className="text-[10px] lg:text-xs font-black uppercase tracking-widest text-white italic">{col.title}</h3>
+              <div className="flex items-center gap-3">
+                 <div className={`w-3 h-3 rounded-full ${col.color} shadow-lg shadow-black/40`} />
+                 <h3 className="text-[11px] lg:text-xs font-black uppercase tracking-[0.15em] text-white italic drop-shadow-sm">{col.title}</h3>
+              </div>
+              <span className="bg-brand-sidebar border border-brand-border text-brand-accent text-[9px] px-3 py-1 rounded-lg font-black italic shadow-inner">
+                {filteredOrders.filter((o) => o.status === col.label).length} {filteredOrders.filter((o) => o.status === col.label).length === 1 ? 'ORDEN' : 'ORDENES'}
+              </span>
             </div>
-            <span className="bg-brand-sidebar border border-brand-border text-slate-muted text-[9px] px-2 py-0.5 rounded-md font-black italic">
-              {filteredOrders.filter((o) => o.status === col.label).length} ORDENES
-            </span>
-          </div>
 
           <div className="flex-1 space-y-4 overflow-y-auto pr-2 custom-scrollbar">
             <AnimatePresence mode="popLayout">
@@ -452,17 +456,17 @@ export function KanbanBoard({ searchQuery = '' }: { searchQuery?: string }) {
 
 function StatCard({ label, value, icon: Icon, color, bgColor }: any) {
   return (
-    <div className={`card !p-6 border border-brand-border/50 ${bgColor} relative overflow-hidden group`}>
-      <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-        <Icon size={64} />
+    <div className={`p-6 rounded-[2rem] border border-brand-border/60 ${bgColor.replace('/5', '/10')} bg-brand-sidebar/40 relative overflow-hidden group shadow-lg`}>
+      <div className={`absolute top-0 right-0 p-4 ${color} opacity-[0.03] group-hover:opacity-[0.08] transition-opacity`}>
+        <Icon size={80} />
       </div>
-      <div className="flex items-center gap-4 relative z-10">
-        <div className={`w-12 h-12 rounded-2xl ${bgColor.replace('/5', '/10')} flex items-center justify-center ${color} shadow-lg`}>
-          <Icon size={24} />
+      <div className="flex items-center gap-5 relative z-10">
+        <div className={`w-14 h-14 rounded-2xl ${bgColor.replace('/5', '/20')} flex items-center justify-center ${color} shadow-xl border border-white/5`}>
+          <Icon size={28} />
         </div>
         <div>
-          <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">{label}</p>
-          <p className={`text-2xl font-black italic tracking-tighter ${color} leading-none`}>{value}</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">{label}</p>
+          <p className={`text-3xl font-black italic tracking-tighter ${color} leading-none drop-shadow-sm`}>{value}</p>
         </div>
       </div>
     </div>
